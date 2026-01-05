@@ -1,0 +1,27 @@
+# mise configuration for Neovim development dependencies
+# https://mise.jdx.dev/
+#
+# Note: Some tools (like selene) are not available in mise and should be
+# installed via Mason within Neovim or via your system package manager.
+
+[tools]
+# Lua - for Neovim configuration
+lua = "5.1"
+
+# Stylua - Lua formatter
+stylua = "latest"
+
+# Note: Selene (Lua linter) is not available in mise.
+# It will be automatically installed via Mason when you open Neovim.
+# Alternatively, install manually:
+#   cargo install selene
+#   brew install selene
+
+# Ruby - for ruby-lsp (managed per-project is recommended)
+# ruby = "3.3"
+
+# Node.js - for various language servers and tools
+node = "lts"
+
+[settings]
+experimental = true

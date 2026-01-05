@@ -1,0 +1,20 @@
+# Selene configuration for Neovim Lua linting
+# https://kampfkarren.github.io/selene/
+
+std = "vim"
+
+[config]
+# Additional globals that selene should recognize
+globals = [
+  "vim",
+  "require",
+  "pcall",
+  "pairs",
+  "ipairs",
+  "assert",
+  "type",
+  "string",
+  "table",
+  "math",
+  "os",
+]

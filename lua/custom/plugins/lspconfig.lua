@@ -157,7 +157,8 @@ return {
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
-
+        -- Note: Ruby LSP is configured in lua/custom/plugins/ruby-lsp.lua
+        -- using the adam12/ruby-lsp.nvim plugin for better global/bundled gem support
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -186,7 +187,26 @@ return {
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
+        -- Lua tools
+        'stylua', -- Lua formatter
+        'selene', -- Lua linter
+
+        -- Shell tools
+        'shellcheck', -- Shell script linter
+        'shfmt', -- Shell script formatter
+
+        -- Markdown tools
+        'markdownlint', -- Markdown linter
+        'markdown-toc', -- Markdown TOC generator
+
+        -- YAML/JSON tools
+        'prettier', -- Multi-language formatter (JSON, YAML, Markdown, etc.)
+        'jsonlint', -- JSON linter
+
+        -- Optional: Add more as needed
+        -- 'eslint_d',      -- JavaScript/TypeScript linter
+        -- 'black',         -- Python formatter
+        -- 'pylint',        -- Python linter
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
