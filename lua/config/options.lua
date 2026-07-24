@@ -37,13 +37,7 @@ if not vim.g.vscode then
   opt.laststatus = 3 -- single global statusline
   opt.list = true
   opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-  opt.fillchars = {
-    eob = " ",
-    fold = " ",
-    foldopen = "",
-    foldsep = " ",
-    foldclose = "",
-  }
+  opt.fillchars = { eob = " " } -- hide the ~ end-of-buffer markers
 
   -- Indentation: ship a 2-space default (vim-rails/editorconfig refine per project).
   opt.expandtab = true
