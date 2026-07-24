@@ -6,6 +6,7 @@ One config runs in two places: **standalone Neovim** and **inside the [VSCode-Ne
 
 ## Documentation
 
+- [Setup](docs/setup.md) — installing the toolchain (Homebrew + mise) on a fresh machine
 - [Getting started](docs/getting-started.md) — requirements, first launch, updating, backups
 - [Keymap reference](docs/keymaps.md) — the full cheatsheet
 - [Rails workflow](docs/rails-workflow.md) — ruby-lsp, formatting, navigation, RSpec
