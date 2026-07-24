@@ -4,6 +4,8 @@ A curated [lazy.nvim](https://github.com/folke/lazy.nvim) config built for a Rub
 
 One config runs in two places: **standalone Neovim** and **inside the [VSCode-Neovim](https://github.com/vscode-neovim/vscode-neovim) extension**. Heavy UI plugins are gated on `vim.g.vscode`, so VS Code keeps its own UI while Neovim still provides motions, text objects, surround, flash, and comments.
 
+> 🎮 **[Play Keycombat](https://andrewmcodes.github.io/dotfiles-nvim/)** — an interactive, ADHD-friendly game that drills these keymaps into muscle memory (Rails-developer moves first). Runs right in the browser. Source in [`docs/game/`](docs/game/).
+
 ## Documentation
 
 - [Setup](docs/setup.md) — installing the toolchain (Homebrew + mise) on a fresh machine
@@ -15,6 +17,7 @@ One config runs in two places: **standalone Neovim** and **inside the [VSCode-Ne
 - [Using in VS Code](docs/vscode.md) — the VSCode-Neovim extension
 - [Troubleshooting](docs/troubleshooting.md) — common issues and fixes
 - [Plugin inventory](docs/plugins.md) — every plugin and where it's configured
+- [Keycombat game](docs/game/) — [play it live](https://andrewmcodes.github.io/dotfiles-nvim/) to learn the keymaps by doing
 
 ## Requirements
 
