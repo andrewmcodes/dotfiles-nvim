@@ -91,6 +91,27 @@ return {
         },
       })
 
+      -- Rails navigation: handle ruby-lsp's "open file" command so Code Lens
+      -- "Jump to view" and route links work (like VS Code). Without this, running
+      -- a navigation code lens errors: "does not support command rubyLsp.openFile".
+      -- ruby-lsp sends a URI of the form file://path/to/file.rb#L12.
+      vim.lsp.commands["rubyLsp.openFile"] = function(command)
+        local arg = command.arguments and command.arguments[1]
+        local uri_frag = type(arg) == "table" and arg[1] or arg
+        if not uri_frag then
+          return
+        end
+        local uri, line = uri_frag:match("^(.+)#L(%d+)$")
+        uri = uri or uri_frag
+        local bufnr = vim.uri_to_bufnr(uri)
+        vim.fn.bufload(bufnr)
+        vim.bo[bufnr].buflisted = true
+        vim.api.nvim_set_current_buf(bufnr)
+        if line then
+          pcall(vim.api.nvim_win_set_cursor, 0, { tonumber(line), 0 })
+        end
+      end
+
       -- JavaScript / JSX (no TypeScript in this project).
       vim.lsp.config("vtsls", {
         filetypes = { "javascript", "javascriptreact" },
@@ -222,6 +243,14 @@ return {
           map("n", "<leader>cr", vim.lsp.buf.rename, "Rename Symbol")
           map({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, "Code Action")
           map("n", "<leader>cl", vim.lsp.codelens.run, "Run Code Lens")
+          map("n", "<leader>cs", function()
+            local ok_tel, builtin = pcall(require, "telescope.builtin")
+            if ok_tel then
+              builtin.lsp_dynamic_workspace_symbols()
+            else
+              vim.lsp.buf.workspace_symbol("")
+            end
+          end, "Workspace Symbols")
 
           -- Toggle inlay hints (capability-gated).
           if client and client:supports_method("textDocument/inlayHint") then
