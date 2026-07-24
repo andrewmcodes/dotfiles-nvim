@@ -99,7 +99,7 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       options = {
-        theme = "tokyonight",
+        theme = "onedark",
         icons_enabled = true,
         globalstatus = true,
         component_separators = { left = "", right = "" },

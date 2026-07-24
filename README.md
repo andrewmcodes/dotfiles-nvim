@@ -43,7 +43,7 @@ lua/config/
   lazy.lua               lazy.nvim bootstrap + setup (imports lua/plugins/)
   vscode.lua             delegates LSP/files/search to VS Code commands
 lua/plugins/
-  colorscheme.lua        tokyonight (active) + catppuccin (available)
+  colorscheme.lua        onedarkpro (active) + tokyonight/catppuccin (available)
   ui.lua                 snacks, lualine, bufferline, which-key, noice
   editor.lua             telescope, neo-tree, trouble, todo-comments, flash
   treesitter.lua         syntax + indent (the rewritten `main` branch; Neovim 0.12+)

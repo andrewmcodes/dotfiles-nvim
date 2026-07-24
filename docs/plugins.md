@@ -6,7 +6,8 @@ Every plugin, where it's configured, and what it does. Each `lua/plugins/*.lua` 
 
 | Plugin | Purpose |
 | --- | --- |
-| `folke/tokyonight.nvim` | Active colorscheme (`tokyonight-night`) |
+| `olimorris/onedarkpro.nvim` | Active colorscheme (`onedark`) |
+| `folke/tokyonight.nvim` | Alternative colorscheme (`:colorscheme tokyonight-night`) |
 | `catppuccin/nvim` | Alternative colorscheme (`:colorscheme catppuccin`) |
 | `folke/snacks.nvim` | Dashboard, notifier, indent guides, scroll, big-file handling, terminal, lazygit |
 | `nvim-lualine/lualine.nvim` | Statusline |

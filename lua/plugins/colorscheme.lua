@@ -1,21 +1,34 @@
--- Colorschemes. Tokyonight is active; catppuccin is installed as an alternative.
+-- Colorschemes. onedarkpro is active; tokyonight and catppuccin are installed as alternatives.
 local function not_vscode()
   return not vim.g.vscode
 end
 
 return {
   {
-    "folke/tokyonight.nvim",
+    "olimorris/onedarkpro.nvim",
     priority = 1000,
     lazy = false,
     cond = not_vscode,
     opts = {
-      style = "night",
+      options = {
+        cursorline = true,
+      },
     },
     config = function(_, opts)
-      require("tokyonight").setup(opts)
-      vim.cmd.colorscheme("tokyonight-night")
+      require("onedarkpro").setup(opts)
+      vim.cmd.colorscheme("onedark")
     end,
+  },
+
+  -- Available alternative (not active). Switch with `:colorscheme tokyonight-night`.
+  {
+    "folke/tokyonight.nvim",
+    lazy = true,
+    priority = 1000,
+    cond = not_vscode,
+    opts = {
+      style = "night",
+    },
   },
 
   -- Available alternative (not active). Switch with `:colorscheme catppuccin`.

@@ -20,7 +20,7 @@ require("lazy").setup({
     { import = "plugins" },
   },
   defaults = { lazy = true },
-  install = { colorscheme = { "tokyonight-night", "habamax" } },
+  install = { colorscheme = { "onedark", "habamax" } },
   rocks = { enabled = false }, -- no plugin here needs luarocks; skip the hererocks setup
   checker = { enabled = true, notify = false }, -- quietly track plugin updates
   change_detection = { notify = false },
