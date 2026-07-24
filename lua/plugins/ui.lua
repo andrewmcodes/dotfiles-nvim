@@ -63,6 +63,14 @@ return {
                 require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") })
               end,
             },
+            {
+              icon = " ",
+              key = "?",
+              desc = "Cheatsheet",
+              action = function()
+                require("which-key").show({ global = true })
+              end,
+            },
             { icon = "󰒲 ", key = "l", desc = "Lazy", action = "<cmd>Lazy<cr>" },
             { icon = " ", key = "q", desc = "Quit", action = "<cmd>qa<cr>" },
           },
@@ -159,6 +167,22 @@ return {
     config = function(_, opts)
       local wk = require("which-key")
       wk.setup(opts)
+
+      -- One-key cheatsheet: the live, always-accurate map of every keybinding.
+      vim.keymap.set("n", "<leader>?", function()
+        wk.show({ global = true })
+      end, { desc = "Cheatsheet (all keymaps)" })
+
+      -- Auto-show the cheatsheet on startup when nvim opens with no file (i.e. on
+      -- the dashboard). Deferred so which-key has fully registered every mapping.
+      if vim.fn.argc() == 0 then
+        vim.schedule(function()
+          pcall(function()
+            wk.show({ global = true })
+          end)
+        end)
+      end
+
       -- Group labels for every leader prefix used across the config.
       wk.add({
         { "<leader>f", group = "Find" },
