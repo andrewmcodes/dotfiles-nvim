@@ -1,0 +1,267 @@
+-- Editor tooling: telescope, neo-tree, trouble, todo-comments, flash.
+-- Most are gated off under VS Code; flash is NOT (works in both — see build contract).
+local function not_vscode()
+  return not vim.g.vscode
+end
+
+return {
+  {
+    "nvim-telescope/telescope.nvim",
+    cmd = "Telescope",
+    event = "VeryLazy",
+    cond = not_vscode,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "make",
+        cond = function()
+          return vim.fn.executable("make") == 1
+        end,
+      },
+      "nvim-telescope/telescope-ui-select.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+    keys = {
+      {
+        "<leader><space>",
+        function()
+          require("telescope.builtin").find_files()
+        end,
+        desc = "Find Files",
+      },
+      {
+        "<leader>ff",
+        function()
+          require("telescope.builtin").find_files()
+        end,
+        desc = "Find Files",
+      },
+      {
+        "<leader>fr",
+        function()
+          require("telescope.builtin").oldfiles()
+        end,
+        desc = "Recent Files",
+      },
+      {
+        "<leader>fg",
+        function()
+          require("telescope.builtin").git_files()
+        end,
+        desc = "Find Git Files",
+      },
+      {
+        "<leader>,",
+        function()
+          require("telescope.builtin").buffers()
+        end,
+        desc = "Buffers",
+      },
+      {
+        "<leader>/",
+        function()
+          require("telescope.builtin").live_grep()
+        end,
+        desc = "Grep (Live)",
+      },
+      {
+        "<leader>sw",
+        function()
+          require("telescope.builtin").grep_string()
+        end,
+        desc = "Search Word",
+        mode = { "n", "x" },
+      },
+      {
+        "<leader>sg",
+        function()
+          require("telescope.builtin").live_grep()
+        end,
+        desc = "Search by Grep",
+      },
+      {
+        "<leader>sh",
+        function()
+          require("telescope.builtin").help_tags()
+        end,
+        desc = "Search Help",
+      },
+      {
+        "<leader>sk",
+        function()
+          require("telescope.builtin").keymaps()
+        end,
+        desc = "Search Keymaps",
+      },
+      {
+        "<leader>sd",
+        function()
+          require("telescope.builtin").diagnostics()
+        end,
+        desc = "Search Diagnostics",
+      },
+      {
+        "<leader>sr",
+        function()
+          require("telescope.builtin").resume()
+        end,
+        desc = "Resume Search",
+      },
+      {
+        "<leader>sc",
+        function()
+          require("telescope.builtin").commands()
+        end,
+        desc = "Search Commands",
+      },
+      {
+        "<leader>sn",
+        function()
+          require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") })
+        end,
+        desc = "Search Nvim Config",
+      },
+    },
+    opts = function()
+      return {
+        defaults = {
+          mappings = {
+            i = { ["<c-enter>"] = "to_fuzzy_refine" },
+          },
+        },
+        extensions = {
+          ["ui-select"] = {
+            require("telescope.themes").get_dropdown(),
+          },
+        },
+      }
+    end,
+    config = function(_, opts)
+      local telescope = require("telescope")
+      telescope.setup(opts)
+      pcall(telescope.load_extension, "fzf")
+      pcall(telescope.load_extension, "ui-select")
+    end,
+  },
+
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    cmd = "Neotree",
+    cond = not_vscode,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+    keys = {
+      { "<leader>e", "<cmd>Neotree toggle reveal<cr>", desc = "Explorer (Toggle)" },
+      { "<leader>E", "<cmd>Neotree focus reveal<cr>", desc = "Explorer (Reveal File)" },
+    },
+    opts = {
+      close_if_last_window = true,
+      filesystem = {
+        follow_current_file = { enabled = true },
+        use_libuv_file_watcher = true,
+        filtered_items = {
+          hide_dotfiles = false,
+          hide_gitignored = false,
+        },
+      },
+      window = {
+        width = 32,
+      },
+    },
+  },
+
+  {
+    "folke/trouble.nvim",
+    cmd = "Trouble",
+    cond = not_vscode,
+    opts = {},
+    keys = {
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+      { "<leader>xs", "<cmd>Trouble symbols toggle<cr>", desc = "Symbols (Trouble)" },
+      { "<leader>xl", "<cmd>Trouble lsp toggle<cr>", desc = "LSP Definitions / References (Trouble)" },
+      { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
+      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
+    },
+  },
+
+  {
+    "folke/todo-comments.nvim",
+    event = "VeryLazy",
+    cond = not_vscode,
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = { signs = true },
+    keys = {
+      {
+        "]t",
+        function()
+          require("todo-comments").jump_next()
+        end,
+        desc = "Next Todo Comment",
+      },
+      {
+        "[t",
+        function()
+          require("todo-comments").jump_prev()
+        end,
+        desc = "Prev Todo Comment",
+      },
+      { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Search Todos" },
+      { "<leader>xt", "<cmd>Trouble todo toggle<cr>", desc = "Todos (Trouble)" },
+    },
+  },
+
+  -- Flash: NOT gated — jump motions work inside VS Code too.
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    keys = {
+      {
+        "s",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").jump()
+        end,
+        desc = "Flash",
+      },
+      {
+        "S",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").treesitter()
+        end,
+        desc = "Flash Treesitter",
+      },
+      {
+        "r",
+        mode = "o",
+        function()
+          require("flash").remote()
+        end,
+        desc = "Remote Flash",
+      },
+      {
+        "R",
+        mode = { "o", "x" },
+        function()
+          require("flash").treesitter_search()
+        end,
+        desc = "Treesitter Search",
+      },
+      {
+        "<c-s>",
+        mode = { "c" },
+        function()
+          require("flash").toggle()
+        end,
+        desc = "Toggle Flash Search",
+      },
+    },
+  },
+}
