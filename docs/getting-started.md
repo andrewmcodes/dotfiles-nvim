@@ -18,6 +18,7 @@ The switch is automatic: `init.lua` checks `vim.g.vscode` (set by the extension)
 | Neovim **0.12+** | Uses the native `vim.lsp.config`/`vim.lsp.enable` API |
 | A Nerd Font | Icons in the statusline, tree, completion menu (JetBrainsMono Nerd Font assumed) |
 | `git`, `rg`, `fd`, `make`, C compiler | Fuzzy finding, grep, treesitter/fzf-native builds |
+| `tree-sitter` CLI (via mise) | nvim-treesitter's `main` branch compiles parsers locally |
 | `lazygit` | `<leader>gg` git UI |
 | `node`, `mise` | JS tooling; `mise` resolves the per-project Ruby/Node |
 | GitHub Copilot subscription | Inline completion, chat, and Avante (no API keys needed) |

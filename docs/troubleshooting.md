@@ -23,9 +23,9 @@ Mason installs them on first file open. If something's absent:
 
 ## Treesitter errors or missing highlights
 
-- `:TSUpdate` to build/update parsers (needs a C compiler — `cc`).
+- `:TSUpdate` to build/update parsers (needs the `tree-sitter` CLI — provided via mise — plus a C compiler like `cc`).
 - `:checkhealth vim.treesitter`.
-- The config pins nvim-treesitter to the `master` branch (classic `.configs` API). If you switch to the `main` rewrite, the setup differs.
+- nvim-treesitter runs the rewritten `main` branch (required on Neovim 0.12+; the old `master` `.configs` API is 0.11-only). It is **not** lazy-loaded, and highlighting/indentation are enabled per-buffer from a `FileType` autocmd in `treesitter.lua` rather than via `ensure_installed`. If a file opens unhighlighted on the very first launch, the parser is still compiling in the background — reopen it once install finishes. Confirm the CLI is reachable with `:echo exepath('tree-sitter')` (launch nvim from a mise-activated shell if it's empty).
 
 ## Completion has no fuzzy matching / "no rust binary"
 

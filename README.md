@@ -20,6 +20,7 @@ One config runs in two places: **standalone Neovim** and **inside the [VSCode-Ne
 - Neovim **0.12+** (uses the native `vim.lsp.config`/`vim.lsp.enable` API).
 - A Nerd Font (JetBrainsMono Nerd Font is assumed for icons).
 - `git`, `rg` (ripgrep), `fd`, `make`, a C compiler, `lazygit`, `node`, and `ruby`.
+- `tree-sitter` (the parser CLI) on `PATH` — nvim-treesitter's `main` branch compiles parsers locally. It's provided here via mise, so launch nvim from a mise-activated shell (the same requirement as ruby-lsp).
 - For Ruby: `ruby-lsp` on `PATH` (already provided here via mise). It runs the project's composed bundle, which auto-loads `ruby-lsp-rails` and `ruby-lsp-rspec`.
 - For AI: the `claude`, `opencode`, and `codex` CLIs (already installed) plus a GitHub Copilot subscription. No model API keys are needed — everything is subscription-based.
 
@@ -41,7 +42,7 @@ lua/plugins/
   colorscheme.lua        tokyonight (active) + catppuccin (available)
   ui.lua                 snacks, lualine, bufferline, which-key, noice
   editor.lua             telescope, neo-tree, trouble, todo-comments, flash
-  treesitter.lua         syntax + indent (pinned to the master/.configs API)
+  treesitter.lua         syntax + indent (the rewritten `main` branch; Neovim 0.12+)
   editing.lua            mini.ai/surround/pairs, ts-comments, vim-repeat (both envs)
   lsp.lua                nvim-lspconfig + mason; ruby_lsp, vtsls, eslint, stimulus_ls, ...
   completion.lua         blink.cmp (+ Copilot source)

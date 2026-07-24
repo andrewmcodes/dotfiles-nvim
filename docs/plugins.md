@@ -23,7 +23,7 @@ Every plugin, where it's configured, and what it does. Each `lua/plugins/*.lua` 
 | `folke/trouble.nvim` | Diagnostics / symbols / quickfix list (`<leader>x`) |
 | `folke/todo-comments.nvim` | Highlight + navigate TODO/FIXME/etc. |
 | `folke/flash.nvim` | Jump-to-anywhere motions (`s`/`S`) — loads in VS Code too |
-| `nvim-treesitter/nvim-treesitter` (+ textobjects) | Syntax highlighting + indentation |
+| `nvim-treesitter/nvim-treesitter` (`main` branch) | Syntax highlighting + indentation (not lazy-loaded; parsers compiled via the `tree-sitter` CLI) |
 | `echasnovski/mini.nvim` | `mini.ai` text objects, `mini.surround`, `mini.pairs` — loads in VS Code too |
 | `folke/ts-comments.nvim` | Treesitter-aware `gc`/`gcc` commenting — loads in VS Code too |
 | `tpope/vim-repeat` | `.` repeat for plugin maps — loads in VS Code too |
