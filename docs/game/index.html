@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keycombat — learn this Neovim config by playing</title>
+    <meta
+      name="description"
+      content="An interactive, ADHD-friendly game for drilling the keymaps in this Neovim config, Rails-developer moves first."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>"
+    />
+  </head>
+  <body>
+    <canvas id="fx"></canvas>
+    <div id="app">
+      <!-- ══════════════ HOME ══════════════ -->
+      <section id="home" class="screen active">
+        <header class="masthead">
+          <div class="brand">
+            <h1><span class="glow">Key</span>combat</h1>
+            <p>Drill this config's real keymaps until they're pure muscle memory. Rails moves first.</p>
+          </div>
+          <div class="toolbar">
+            <button class="btn ghost" id="toggle-sound" aria-pressed="true">🔊 Sound</button>
+            <button class="btn ghost" id="toggle-motion" aria-pressed="true">✨ Motion</button>
+            <button class="btn ghost danger" id="btn-reset" title="Reset all progress">↺ Reset</button>
+          </div>
+        </header>
+
+        <div class="rank">
+          <div class="rank-badge">
+            <span id="rank-level">LV 1</span>
+            <small>LEVEL</small>
+          </div>
+          <div class="rank-body">
+            <div class="rank-line">
+              <span id="rank-title">Fresh Install</span>
+              <span id="rank-xp">0 XP</span>
+            </div>
+            <div class="bar"><span id="rank-fill" style="width: 0%"></span></div>
+            <div id="rank-next">Start training to earn XP</div>
+          </div>
+          <div class="rank-side">
+            <b id="stat-mastered-total">0 / 0</b>
+            <span>mastered</span>
+          </div>
+        </div>
+
+        <div class="cta-row">
+          <button class="btn primary big" id="btn-start">▶ Start training</button>
+          <button class="btn big" id="btn-cheat">📖 Cheat sheet</button>
+          <span class="hint-text">Tip: press the keys on your real keyboard. <kbd>Esc</kbd> quits a round.</span>
+        </div>
+
+        <h2 class="section-h">Worlds</h2>
+        <div id="world-grid"></div>
+      </section>
+
+      <!-- ══════════════ PLAY ══════════════ -->
+      <section id="play" class="screen">
+        <div class="play-hud">
+          <button class="btn ghost" id="play-back">← Quit</button>
+          <span id="play-world">World</span>
+          <span class="hud-spacer"></span>
+          <span id="hud-combo"></span>
+          <span class="hud-metric"><small>XP</small><span id="hud-score">0</span></span>
+        </div>
+        <div id="round-count">Round 1 / 12</div>
+        <div class="play-bar"><div id="progress-fill"></div></div>
+
+        <div class="card" id="card">
+          <span class="card-chip" id="card-chip">World</span>
+          <div class="card-label" id="card-label">Action</div>
+          <div class="card-prompt" id="card-prompt">Do the thing…</div>
+          <div class="mastery-dots" id="mastery-dots"></div>
+          <div class="prompt-instr" id="prompt-instr">Type the keys…</div>
+          <div class="pressed" id="pressed"></div>
+          <div class="answer-reveal hidden" id="answer-reveal"></div>
+          <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div class="play-foot">
+          <button class="btn ghost" id="btn-hint">💡 Hint (½ points)</button>
+          <button class="btn ghost" id="btn-show">👀 Show me</button>
+        </div>
+      </section>
+
+      <!-- ══════════════ RESULTS ══════════════ -->
+      <section id="results" class="screen">
+        <div class="results-wrap">
+          <div class="results-crown">🏆</div>
+          <h2 id="results-world">World complete!</h2>
+          <p id="results-grade">Nice work.</p>
+          <div id="results-rank">Level 1 · Fresh Install</div>
+          <div class="results-stats">
+            <div class="rstat"><b id="stat-xp">+0</b><span>XP earned</span></div>
+            <div class="rstat"><b id="stat-acc">0%</b><span>first-try accuracy</span></div>
+            <div class="rstat"><b id="stat-combo">0×</b><span>best combo</span></div>
+            <div class="rstat"><b id="stat-mastered">0</b><span>newly mastered</span></div>
+          </div>
+          <div class="results-btns">
+            <button class="btn primary big" id="btn-next-world">Next world</button>
+            <button class="btn big" id="btn-replay">🔁 Replay</button>
+            <button class="btn big" id="results-home">🏠 Home</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════ CHEAT SHEET ══════════════ -->
+      <section id="cheatsheet" class="screen">
+        <div class="cheat-head">
+          <h2 style="margin: 0">📖 Cheat sheet</h2>
+          <button class="btn" id="cheat-back">← Back</button>
+        </div>
+        <p style="color: var(--muted); margin-top: 0">
+          Every keymap the game drills, straight from this config. ★ = mastered. Full reference lives in
+          <code>docs/keymaps.md</code>.
+        </p>
+        <div id="cheat-list"></div>
+      </section>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>

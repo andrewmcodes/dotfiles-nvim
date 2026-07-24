@@ -1,0 +1,45 @@
+name: Deploy game to GitHub Pages
+
+# Publishes docs/game/ (the "Keycombat" keymap trainer) as the site root, so it
+# lives at https://andrewmcodes.github.io/dotfiles-nvim/. Only the game files
+# affect the site, so we only redeploy when they (or this workflow) change.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/game/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a newer deploy cancel an in-progress one, but never interrupt a live run
+# mid-publish for the same group.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload game as Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/game
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

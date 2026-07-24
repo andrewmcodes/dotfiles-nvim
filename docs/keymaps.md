@@ -2,6 +2,8 @@
 
 Leader is <kbd>Space</kbd>. Press <kbd>Space</kbd> and pause to let [which-key](https://github.com/folke/which-key.nvim) show every option. This page is the full reference; most maps also carry a `desc` visible in `:Telescope keymaps` (`<leader>sk`).
 
+> 🎮 **Want to *drill* these instead of read them?** Open [`game/index.html`](game/) — an interactive, ADHD-friendly game (Keycombat) that quizzes you on these bindings, Rails-developer moves first. See [game/README.md](game/README.md).
+
 ## General & editing
 
 | Key | Mode | Action |
