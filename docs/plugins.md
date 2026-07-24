@@ -44,7 +44,7 @@ Every plugin, where it's configured, and what it does. Each `lua/plugins/*.lua` 
 
 Servers enabled: `ruby_lsp` (via `mise x`), `vtsls`, `eslint`, `stimulus_ls`, `lua_ls`, `jsonls`, `yamlls`, `cssls`, `html`, `marksman`, `bashls`, `taplo`.
 
-## Languages — `ruby.lua`, `javascript.lua`, `stimulus.lua`, `markdown.lua`
+## Languages — `ruby.lua`, `javascript.lua`, `stimulus.lua`, `markdown.lua`, `obsidian.lua`
 
 | Plugin | Purpose |
 | --- | --- |
@@ -54,6 +54,7 @@ Servers enabled: `ruby_lsp` (via `mise x`), `vtsls`, `eslint`, `stimulus_ls`, `l
 | `windwp/nvim-ts-autotag` | Auto close/rename JSX/HTML/ERB tags |
 | `MeanderingProgrammer/render-markdown.nvim` | In-buffer Markdown rendering |
 | `iamcco/markdown-preview.nvim` | Browser Markdown preview (`<leader>cp`) |
+| `obsidian-nvim/obsidian.nvim` | Obsidian `digital-brain` vault: daily notes, search, wikilink completion/nav (`<leader>o`) |
 
 (`stimulus.lua` is intentionally empty — Stimulus is covered by `stimulus_ls` + treesitter.)
 

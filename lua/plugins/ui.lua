@@ -194,6 +194,7 @@ return {
         { "<leader>a", group = "AI" },
         { "<leader>A", group = "Avante" },
         { "<leader>b", group = "Buffer" },
+        { "<leader>o", group = "Obsidian" },
         { "<leader>r", group = "Rails" },
         { "<leader>u", group = "UI" },
         { "<leader>x", group = "Trouble" },

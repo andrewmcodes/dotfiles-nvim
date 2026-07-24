@@ -33,7 +33,8 @@ python3 -m http.server -d docs/game 8000   # then visit http://localhost:8000
 5. 🌿 **Git Flow** — Lazygit, Diffview, blame, hunks, stage/reset
 6. 🤖 **AI Copilot** — accept/cycle suggestions, chat, explain/fix/tests, Claude Code terminal
 7. 🥷 **Motion Master** — flash, surround, comment, move lines (these work in VS Code too)
-8. 👑 **Boss: Everything** — a gauntlet drawn from every world (unlocks once the rest are cleared)
+8. 🧠 **Second Brain** — Obsidian: daily note, new/search/quick-switch, backlinks, follow link, toggle checkbox, templates
+9. 👑 **Boss: Everything** — a gauntlet drawn from every world (unlocks once the rest are cleared)
 
 Every world is playable immediately — pick any one. Clearing a world still fills its mastery ring and marks it ✓, and the Boss draws from all of them. Progress is saved in your browser's `localStorage` — the `↺ Reset` button wipes it.
 

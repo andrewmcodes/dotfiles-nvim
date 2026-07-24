@@ -149,6 +149,27 @@ Leader is <kbd>Space</kbd>. Press <kbd>Space</kbd> and pause to let [which-key](
 | `<leader>Ae` | v | Avante edit selection |
 | `<leader>ac` `<leader>ao` `<leader>aC` | n | Toggle Claude Code / opencode / Codex terminal |
 
+## Obsidian (digital-brain vault)
+
+Standalone Neovim only (gated off under VS Code). Group label: **Obsidian**.
+
+| Key | Action |
+| --- | --- |
+| `<leader>on` | New note (in `+inbox`) |
+| `<leader>oo` | Open current note in the Obsidian app |
+| `<leader>os` | Search notes (grep the vault) |
+| `<leader>oq` | Quick switch note (fuzzy by name) |
+| `<leader>ot` | Today's daily note |
+| `<leader>oy` | Yesterday's daily note |
+| `<leader>od` | Pick a daily note |
+| `<leader>ob` | Backlinks |
+| `<leader>ol` | Links in note |
+| `<leader>oT` | Insert template |
+| `<leader>or` | Rename note (update links) |
+| `<leader>op` | Paste image |
+| `<leader>ox` | Toggle checkbox |
+| `<leader>og` | Follow link under cursor |
+
 ## Rails (vim-rails)
 
 `<leader>ra` alternate file, `<leader>rr` related file (vim-rails). Fuzzy resource pickers (telescope-rails): `<leader>rm` models, `<leader>rc` controllers, `<leader>rv` views, `<leader>rs` specs, `<leader>ri` migrations, `<leader>rl` libs. Commands: `:A`, `:AV`, `:AS`, `:R`, `:Emodel`, `:Eview`, `:Econtroller`, `:Emigration`, `:Rails`. `gf` jumps to partials, associations, and requires. See [rails-workflow.md](rails-workflow.md).
