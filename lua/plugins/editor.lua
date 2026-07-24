@@ -155,6 +155,16 @@ return {
       "MunifTanjim/nui.nvim",
       "nvim-tree/nvim-web-devicons",
     },
+    -- `cmd`/`keys` don't fire for `nvim .`, so load neo-tree eagerly when nvim is
+    -- launched on a directory. Its netrw hijack then takes over the "." buffer.
+    init = function()
+      if vim.fn.argc(-1) == 1 then
+        local stat = (vim.uv or vim.loop).fs_stat(vim.fn.argv(0))
+        if stat and stat.type == "directory" then
+          require("neo-tree")
+        end
+      end
+    end,
     keys = {
       { "<leader>e", "<cmd>Neotree toggle reveal<cr>", desc = "Explorer (Toggle)" },
       { "<leader>E", "<cmd>Neotree focus reveal<cr>", desc = "Explorer (Reveal File)" },
@@ -162,6 +172,8 @@ return {
     opts = {
       close_if_last_window = true,
       filesystem = {
+        -- Take over directory buffers (e.g. `nvim .`) in the current window.
+        hijack_netrw_behavior = "open_current",
         follow_current_file = { enabled = true },
         use_libuv_file_watcher = true,
         filtered_items = {

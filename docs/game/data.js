@@ -158,6 +158,14 @@ const CARDS = [
     mnemonic: "e = explorer.",
   },
   {
+    id: "cheatsheet",
+    world: "daily",
+    keys: ["<leader>?"],
+    label: "Keybinding cheatsheet",
+    prompt: "Forgot a mapping? Show every keybinding, grouped and searchable.",
+    mnemonic: "? = help me — the whole config's keymap, on demand.",
+  },
+  {
     id: "win-left",
     world: "daily",
     keys: ["<C-h>"],

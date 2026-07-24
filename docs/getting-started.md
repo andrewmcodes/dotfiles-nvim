@@ -36,6 +36,22 @@ Ruby tooling (`ruby-lsp`, `standardrb`, `rubocop`) comes from the project's own 
 
 `ruby-lsp` is **not** installed by Mason — it is launched via `mise x -- ruby-lsp` so it always runs under the project's pinned Ruby and loads its Rails/RSpec/Standard addons from the project bundle.
 
+## Opening a project
+
+Two common ways in, both of which land you in a usable state:
+
+- **`nvim`** (no argument) — opens the dashboard: a menu with Find File, Recent Files, Grep, Config, Lazy, and Cheatsheet. The full keybinding cheatsheet also pops up automatically; press `Esc` to dismiss it.
+- **`nvim .`** (or any directory) — opens the [neo-tree](https://github.com/nvim-neo-tree/neo-tree.nvim) file explorer on that folder, filling the window. Pick a file with `<CR>` to start editing.
+
+Once you're in a buffer, the essentials:
+
+- `<leader>e` — toggle the file explorer sidebar (`<leader>` is `Space`).
+- `<leader><space>` or `<leader>ff` — fuzzy-find files.
+- `<leader>/` — live-grep the project.
+- `<leader>?` — the cheatsheet: every keybinding, grouped and always up to date. When you forget a mapping, this is the answer. You can also just press `<leader>` and pause to let [which-key](https://github.com/folke/which-key.nvim) show what's available.
+
+See [keymaps.md](keymaps.md) for the complete reference.
+
 ## How the config loads
 
 ```
