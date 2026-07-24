@@ -53,8 +53,15 @@ return {
 
       -- Per-server configuration --------------------------------------------
       -- Ruby: uses the project's composed bundle (ruby-lsp-rails + ruby-lsp-rspec).
+      -- Launch through `mise x` so ruby-lsp always runs under the project's pinned
+      -- Ruby (e.g. Podia's 4.0.5) regardless of the ambient PATH nvim inherited.
+      -- Falls back to a bare `ruby-lsp` when mise isn't installed.
+      local ruby_lsp_cmd = { "ruby-lsp" }
+      if vim.fn.executable("mise") == 1 then
+        ruby_lsp_cmd = { "mise", "x", "--", "ruby-lsp" }
+      end
       vim.lsp.config("ruby_lsp", {
-        cmd = { "ruby-lsp" },
+        cmd = ruby_lsp_cmd,
         filetypes = { "ruby", "eruby" },
         init_options = {
           formatter = "auto",
