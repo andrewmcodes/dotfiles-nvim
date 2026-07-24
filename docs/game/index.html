@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -22,12 +22,25 @@
         <header class="masthead">
           <div class="brand">
             <h1><span class="glow">Key</span>combat</h1>
-            <p>Drill this config's real keymaps until they're pure muscle memory. Rails moves first.</p>
+            <p>
+              Drill this config's real keymaps until they're pure muscle memory.
+              Rails moves first.
+            </p>
           </div>
           <div class="toolbar">
-            <button class="btn ghost" id="toggle-sound" aria-pressed="true">🔊 Sound</button>
-            <button class="btn ghost" id="toggle-motion" aria-pressed="true">✨ Motion</button>
-            <button class="btn ghost danger" id="btn-reset" title="Reset all progress">↺ Reset</button>
+            <button class="btn ghost" id="toggle-sound" aria-pressed="true">
+              🔊 Sound
+            </button>
+            <button class="btn ghost" id="toggle-motion" aria-pressed="true">
+              ✨ Motion
+            </button>
+            <button
+              class="btn ghost danger"
+              id="btn-reset"
+              title="Reset all progress"
+            >
+              ↺ Reset
+            </button>
           </div>
         </header>
 
@@ -41,7 +54,9 @@
               <span id="rank-title">Fresh Install</span>
               <span id="rank-xp">0 XP</span>
             </div>
-            <div class="bar"><span id="rank-fill" style="width: 0%"></span></div>
+            <div class="bar">
+              <span id="rank-fill" style="width: 0%"></span>
+            </div>
             <div id="rank-next">Start training to earn XP</div>
           </div>
           <div class="rank-side">
@@ -51,9 +66,15 @@
         </div>
 
         <div class="cta-row">
-          <button class="btn primary big" id="btn-start">▶ Start training</button>
+          <button class="btn primary big" id="btn-start">
+            ▶ Start training
+          </button>
           <button class="btn big" id="btn-cheat">📖 Cheat sheet</button>
-          <span class="hint-text">Tip: press the keys on your keyboard. <kbd>Esc</kbd> quits. On a phone, tap the card to bring up the keyboard.</span>
+          <span class="hint-text"
+            >On desktop, press the keys on your keyboard (<kbd>Esc</kbd> quits).
+            On a phone, tap the on-screen keys — including <kbd>Ctrl</kbd>.
+            Every world is unlocked; jump in anywhere.</span
+          >
         </div>
 
         <h2 class="section-h">Worlds</h2>
@@ -62,9 +83,10 @@
 
       <!-- ══════════════ PLAY ══════════════ -->
       <section id="play" class="screen">
-        <!-- Off-screen field whose only job is to summon the soft keyboard on
-             touch devices. Focused on a user tap; its input events feed the
-             engine for keyboards that don't emit usable keydowns (Android). -->
+        <!-- Off-screen fallback field. The on-screen keypad is the primary touch
+             input now; this stays wired to onSoftInput so any device that still
+             routes typing here (e.g. an attached keyboard focusing it) keeps
+             working. -->
         <input
           id="mobile-input"
           type="text"
@@ -81,7 +103,9 @@
           <span id="play-world">World</span>
           <span class="hud-spacer"></span>
           <span id="hud-combo"></span>
-          <span class="hud-metric"><small>XP</small><span id="hud-score">0</span></span>
+          <span class="hud-metric"
+            ><small>XP</small><span id="hud-score">0</span></span
+          >
         </div>
         <div id="round-count">Round 1 / 12</div>
         <div class="play-bar"><div id="progress-fill"></div></div>
@@ -98,10 +122,15 @@
         </div>
 
         <div class="play-foot">
-          <button class="btn ghost touch-only" id="btn-keyboard">⌨️ Keyboard</button>
           <button class="btn ghost" id="btn-hint">💡 Hint (½ points)</button>
           <button class="btn ghost" id="btn-show">👀 Show me</button>
+          <button class="btn ghost" id="btn-skip">⏭ Skip</button>
         </div>
+
+        <!-- On-screen keypad — the input method on touch devices, which have no
+             Ctrl key. Hidden on desktop, where you drive it with the real
+             keyboard. Built in game.js (buildKeypad). -->
+        <div class="keypad" id="keypad" aria-label="On-screen keyboard"></div>
       </section>
 
       <!-- ══════════════ RESULTS ══════════════ -->
@@ -112,13 +141,23 @@
           <p id="results-grade">Nice work.</p>
           <div id="results-rank">Level 1 · Fresh Install</div>
           <div class="results-stats">
-            <div class="rstat"><b id="stat-xp">+0</b><span>XP earned</span></div>
-            <div class="rstat"><b id="stat-acc">0%</b><span>first-try accuracy</span></div>
-            <div class="rstat"><b id="stat-combo">0×</b><span>best combo</span></div>
-            <div class="rstat"><b id="stat-mastered">0</b><span>newly mastered</span></div>
+            <div class="rstat">
+              <b id="stat-xp">+0</b><span>XP earned</span>
+            </div>
+            <div class="rstat">
+              <b id="stat-acc">0%</b><span>first-try accuracy</span>
+            </div>
+            <div class="rstat">
+              <b id="stat-combo">0×</b><span>best combo</span>
+            </div>
+            <div class="rstat">
+              <b id="stat-mastered">0</b><span>newly mastered</span>
+            </div>
           </div>
           <div class="results-btns">
-            <button class="btn primary big" id="btn-next-world">Next world</button>
+            <button class="btn primary big" id="btn-next-world">
+              Next world
+            </button>
             <button class="btn big" id="btn-replay">🔁 Replay</button>
             <button class="btn big" id="results-home">🏠 Home</button>
           </div>
@@ -132,7 +171,8 @@
           <button class="btn" id="cheat-back">← Back</button>
         </div>
         <p style="color: var(--muted); margin-top: 0">
-          Every keymap the game drills, straight from this config. ★ = mastered. Full reference lives in
+          Every keymap the game drills, straight from this config. ★ = mastered.
+          Full reference lives in
           <code>docs/keymaps.md</code>.
         </p>
         <div id="cheat-list"></div>

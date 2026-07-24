@@ -15,7 +15,8 @@
   --bad: #fca5a5;
   --hint: #fcd34d;
   --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
@@ -32,7 +33,12 @@ body {
 body {
   font-family: var(--font);
   color: var(--text);
-  background: radial-gradient(1200px 700px at 50% -10%, #16203a 0%, var(--bg) 55%) fixed;
+  background: radial-gradient(
+      1200px 700px at 50% -10%,
+      #16203a 0%,
+      var(--bg) 55%
+    )
+    fixed;
   overflow-x: hidden;
 }
 
@@ -41,7 +47,8 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: linear-gradient(rgba(125, 211, 252, 0.05) 1px, transparent 1px),
+  background-image:
+    linear-gradient(rgba(125, 211, 252, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(125, 211, 252, 0.05) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 70%);
@@ -208,7 +215,10 @@ body::before {
   border-radius: 10px;
   padding: 9px 14px;
   cursor: pointer;
-  transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.08s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 .btn:hover {
   background: #252c3d;
@@ -284,7 +294,10 @@ body::before {
   border-radius: 16px;
   padding: 16px;
   cursor: pointer;
-  transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.12s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
   position: relative;
   overflow: hidden;
 }
@@ -440,7 +453,9 @@ body::before {
   border-radius: 20px;
   padding: 1px;
   background: linear-gradient(160deg, var(--accent), transparent 60%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0.4;
@@ -512,7 +527,9 @@ body::before {
 .kc-group.lit .kc {
   border-color: var(--accent);
   color: var(--text);
-  box-shadow: 0 3px 0 #0a2a3a, 0 0 14px rgba(125, 211, 252, 0.35);
+  box-shadow:
+    0 3px 0 #0a2a3a,
+    0 0 14px rgba(125, 211, 252, 0.35);
 }
 .kc {
   font-family: var(--mono);
@@ -528,7 +545,9 @@ body::before {
   background: linear-gradient(180deg, #232a3a, #171d29);
   border: 1px solid #384158;
   border-radius: 9px;
-  box-shadow: 0 3px 0 #0c1119, inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 3px 0 #0c1119,
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 .kc-wide {
   min-width: 96px;
@@ -605,6 +624,72 @@ body::before {
   gap: 10px;
   justify-content: center;
   margin-top: 22px;
+}
+
+/* ── on-screen keypad (touch input) ───────────────────────────────────────
+   Phones/tablets have no Ctrl key, so touch devices type on this instead of
+   the OS soft keyboard. Hidden on desktop (keyboard-driven there). */
+.keypad {
+  display: none;
+}
+body.touch .keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 18px auto 0;
+  max-width: 520px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.kp-row {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+}
+.kp-key {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 52px;
+  padding: 0 4px;
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  background: linear-gradient(180deg, #232a3a, #171d29);
+  border: 1px solid #384158;
+  border-radius: 9px;
+  box-shadow:
+    0 3px 0 #0c1119,
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.05s ease;
+}
+.kp-key:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #0c1119,
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.kp-mod {
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--muted);
+}
+.kp-mod.armed {
+  color: #0b0e14;
+  background: linear-gradient(180deg, var(--accent), #4bb8ee);
+  border-color: var(--accent);
+  box-shadow:
+    0 3px 0 #0a2a3a,
+    0 0 14px rgba(125, 211, 252, 0.5);
+}
+.kp-space {
+  flex: 4 1 0;
+  font-family: var(--font);
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--muted);
 }
 
 /* ── results ─────────────────────────────────────────────────────────── */
@@ -764,14 +849,6 @@ body::before {
   pointer-events: none;
 }
 
-/* Controls that only make sense on touch devices (body.touch set in JS). */
-.touch-only {
-  display: none;
-}
-body.touch .touch-only {
-  display: inline-flex;
-}
-
 /* respect the OS / user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -828,6 +905,11 @@ body.touch .touch-only {
   }
   .play-foot {
     flex-wrap: wrap;
+  }
+  /* Fit ten keys across a narrow phone. */
+  .kp-key {
+    height: 46px;
+    font-size: 16px;
   }
 }
 

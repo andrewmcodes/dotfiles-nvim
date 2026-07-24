@@ -96,7 +96,9 @@
     if (m) {
       const mod = m[1];
       const rest = m[2] === "Space" ? " " : m[2];
-      const c = chord(rest.length === 1 ? rest.toLowerCase() : rest.toLowerCase());
+      const c = chord(
+        rest.length === 1 ? rest.toLowerCase() : rest.toLowerCase(),
+      );
       if (mod === "C") c.ctrl = true;
       else if (mod === "S") c.shift = true;
       else c.alt = true; // A or M both mean Alt/Meta here
@@ -111,7 +113,10 @@
   }
 
   function chord(base, opts) {
-    return Object.assign({ base, ctrl: false, alt: false, shift: false }, opts || {});
+    return Object.assign(
+      { base, ctrl: false, alt: false, shift: false },
+      opts || {},
+    );
   }
 
   // Canonical string for comparing two chords.
@@ -213,7 +218,9 @@
       beep(120, 0.22, "sawtooth", 0.12, 0.05);
     },
     win: () => {
-      [523, 659, 784, 1046].forEach((f, i) => beep(f, 0.2, "triangle", 0.16, i * 0.12));
+      [523, 659, 784, 1046].forEach((f, i) =>
+        beep(f, 0.2, "triangle", 0.16, i * 0.12),
+      );
     },
   };
 
@@ -228,7 +235,14 @@
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  const CONFETTI_COLORS = ["#7dd3fc", "#fca5a5", "#86efac", "#fcd34d", "#c4b5fd", "#f9a8d4"];
+  const CONFETTI_COLORS = [
+    "#7dd3fc",
+    "#fca5a5",
+    "#86efac",
+    "#fcd34d",
+    "#c4b5fd",
+    "#f9a8d4",
+  ];
   function burst(x, y, amount) {
     if (!store.settings.motion) return;
     for (let i = 0; i < amount; i++) {
@@ -293,7 +307,14 @@
     const level = idx + 1;
     const into = store.xp - cur.xp;
     const span = next ? next.xp - cur.xp : 1;
-    return { level, title: cur.title, into, span, pct: next ? into / span : 1, next };
+    return {
+      level,
+      title: cur.title,
+      into,
+      span,
+      pct: next ? into / span : 1,
+      next,
+    };
   }
 
   // ── World unlocking ──────────────────────────────────────────────────────
@@ -301,11 +322,10 @@
     if (worldId === "boss") return CARDS.slice();
     return CARDS.filter((c) => c.world === worldId);
   }
-  function isUnlocked(worldId) {
-    const idx = WORLDS.findIndex((w) => w.id === worldId);
-    if (idx === 0) return true;
-    if (worldId === "boss") return WORLDS.filter((w) => w.id !== "boss").every((w) => store.completed[w.id]);
-    return !!store.completed[WORLDS[idx - 1].id];
+  // Every world is open — jump straight to any lesson (e.g. Git Flow) whenever
+  // you like. Completion is still tracked for progress rings and the boss.
+  function isUnlocked() {
+    return true;
   }
   function worldProgress(worldId) {
     const cards = worldCards(worldId);
@@ -322,7 +342,9 @@
     return n;
   };
   function showScreen(name) {
-    document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+    document
+      .querySelectorAll(".screen")
+      .forEach((s) => s.classList.remove("active"));
     $("#" + name).classList.add("active");
     game.screen = name;
   }
@@ -357,6 +379,10 @@
     usedHint: false,
     startTime: 0,
     seqTimer: null,
+    // Sticky modifiers armed via the on-screen keypad (touch). A physical
+    // keyboard carries its own modifiers, so these only affect keypad taps.
+    mods: { ctrl: false, alt: false, shift: false },
+    modButtons: null,
     // session tally
     firstTryCorrect: 0,
     misses: 0,
@@ -380,12 +406,16 @@
       return pool[pool.length - 1];
     };
     const queue = [];
-    const len = pool.length >= SESSION_LEN ? SESSION_LEN : Math.max(pool.length, Math.min(SESSION_LEN, pool.length * 2));
+    const len =
+      pool.length >= SESSION_LEN
+        ? SESSION_LEN
+        : Math.max(pool.length, Math.min(SESSION_LEN, pool.length * 2));
     let guard = 0;
     while (queue.length < len && guard++ < 500) {
       const c = pick();
       // avoid back-to-back repeats when we can
-      if (queue.length && queue[queue.length - 1] === c && pool.length > 1) continue;
+      if (queue.length && queue[queue.length - 1] === c && pool.length > 1)
+        continue;
       queue.push(c);
     }
     return queue;
@@ -408,7 +438,7 @@
     const w = WORLD_BY_ID[worldId];
     $("#play-world").textContent = w.icon + "  " + w.title;
     $("#play").style.setProperty("--accent", w.accent);
-    summonKeyboard(); // raise the soft keyboard on touch (we're in a tap gesture)
+    clearMods();
     nextRound();
   }
 
@@ -427,8 +457,10 @@
   function renderRound() {
     const c = game.current;
     const w = WORLD_BY_ID[c.world];
-    $("#round-count").textContent = "Round " + (game.index + 1) + " / " + game.queue.length;
-    $("#progress-fill").style.width = (game.index / game.queue.length) * 100 + "%";
+    $("#round-count").textContent =
+      "Round " + (game.index + 1) + " / " + game.queue.length;
+    $("#progress-fill").style.width =
+      (game.index / game.queue.length) * 100 + "%";
     $("#hud-score").textContent = game.xpGained.toLocaleString();
     renderCombo();
 
@@ -547,28 +579,102 @@
     const data = e.data || "";
     for (const ch of data) {
       if (game.locked) break;
-      feedChord(chordFromChar(ch));
+      feedChord(withMods(chordFromChar(ch)));
     }
   }
 
-  // Is this a touch-first device? (Governs the soft-keyboard affordances.)
+  // ── On-screen keypad (touch input; the desktop path is the real keyboard) ────
+  // Phones/tablets have no Ctrl key, so we render our own tappable keyboard with
+  // sticky Ctrl / Alt / Shift. Armed modifiers apply to the next key, then clear.
+  const KEYPAD_MODS = [
+    { name: "ctrl", label: "Ctrl" },
+    { name: "alt", label: "⌥ Alt" },
+    { name: "shift", label: "⇧ Shift" },
+  ];
+  const KEYPAD_ROWS = [
+    ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+    ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+    ["z", "x", "c", "v", "b", "n", "m"],
+    ["[", "]", ",", "/", "?"],
+  ];
+
+  function keyLabel(k) {
+    return /^[a-z]$/.test(k) ? k.toUpperCase() : k;
+  }
+
+  function buildKeypad() {
+    const pad = $("#keypad");
+    if (!pad) return;
+    pad.innerHTML = "";
+    game.modButtons = {};
+
+    const modRow = el("div", "kp-row kp-mods");
+    KEYPAD_MODS.forEach((m) => {
+      const b = el("button", "kp-key kp-mod", m.label);
+      b.type = "button";
+      b.addEventListener("click", () => toggleMod(m.name));
+      game.modButtons[m.name] = b;
+      modRow.appendChild(b);
+    });
+    pad.appendChild(modRow);
+
+    KEYPAD_ROWS.forEach((row) => {
+      const r = el("div", "kp-row");
+      row.forEach((k) => {
+        const b = el("button", "kp-key", keyLabel(k));
+        b.type = "button";
+        b.addEventListener("click", () => feedKey(k));
+        r.appendChild(b);
+      });
+      pad.appendChild(r);
+    });
+
+    const spaceRow = el("div", "kp-row");
+    const space = el("button", "kp-key kp-space", "space");
+    space.type = "button";
+    space.addEventListener("click", () => feedKey(" "));
+    spaceRow.appendChild(space);
+    pad.appendChild(spaceRow);
+  }
+
+  function withMods(c) {
+    if (game.mods.ctrl) c.ctrl = true;
+    if (game.mods.alt) c.alt = true;
+    if (game.mods.shift) c.shift = true;
+    clearMods();
+    return c;
+  }
+
+  function toggleMod(name) {
+    game.mods[name] = !game.mods[name];
+    sfx.click();
+    updateModButtons();
+  }
+
+  function updateModButtons() {
+    if (!game.modButtons) return;
+    Object.keys(game.modButtons).forEach((n) => {
+      game.modButtons[n].classList.toggle("armed", !!game.mods[n]);
+    });
+  }
+
+  function clearMods() {
+    game.mods = { ctrl: false, alt: false, shift: false };
+    updateModButtons();
+  }
+
+  function feedKey(base) {
+    if (game.screen !== "play" || game.locked || !game.current) return;
+    sfx.click();
+    feedChord(withMods(chord(base)));
+  }
+
+  // Is this a touch-first device? (Governs the on-screen keypad affordance.)
   const IS_TOUCH =
-    (window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches) ||
+    (window.matchMedia &&
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches) ||
     "ontouchstart" in window ||
     navigator.maxTouchPoints > 0;
-
-  // Focus the hidden field to raise the soft keyboard. Must run inside a user
-  // gesture (tap) on mobile, or the browser refuses to show the keyboard.
-  function summonKeyboard() {
-    if (!IS_TOUCH || game.screen !== "play") return;
-    const field = $("#mobile-input");
-    if (!field) return;
-    try {
-      field.focus({ preventScroll: true });
-    } catch (e) {
-      field.focus();
-    }
-  }
 
   function onCorrect() {
     game.locked = true;
@@ -598,10 +704,18 @@
     const bonus = [];
     if (speedBonus > 1) bonus.push("⚡ fast");
     if (comboMult > 1) bonus.push(comboMult.toFixed(1) + "× combo");
-    banner.textContent = pickPraise() + "  +" + pts + (bonus.length ? "  (" + bonus.join(", ") + ")" : "");
+    banner.textContent =
+      pickPraise() +
+      "  +" +
+      pts +
+      (bonus.length ? "  (" + bonus.join(", ") + ")" : "");
 
     const rect = $("#card").getBoundingClientRect();
-    burst(rect.left + rect.width / 2, rect.top + rect.height / 2, game.combo >= 5 ? 90 : 45);
+    burst(
+      rect.left + rect.width / 2,
+      rect.top + rect.height / 2,
+      game.combo >= 5 ? 90 : 45,
+    );
 
     game.index += 1;
     setTimeout(nextRound, 750);
@@ -663,13 +777,28 @@
     renderKeys(keysRow, game.current.variants[0]);
     reveal.appendChild(keysRow);
     if (game.current.keys.length > 1) {
-      const alt = el("div", "reveal-alt", "also: " + game.current.keys.slice(1).join("  ·  "));
+      const alt = el(
+        "div",
+        "reveal-alt",
+        "also: " + game.current.keys.slice(1).join("  ·  "),
+      );
       reveal.appendChild(alt);
     }
-    reveal.appendChild(el("div", "reveal-mnemonic", "💡 " + game.current.mnemonic));
+    reveal.appendChild(
+      el("div", "reveal-mnemonic", "💡 " + game.current.mnemonic),
+    );
   }
 
-  const PRAISE = ["Nice!", "Clean!", "Boom!", "Muscle memory!", "Snappy!", "Yes!", "Locked in!", "Smooth!"];
+  const PRAISE = [
+    "Nice!",
+    "Clean!",
+    "Boom!",
+    "Muscle memory!",
+    "Snappy!",
+    "Yes!",
+    "Locked in!",
+    "Smooth!",
+  ];
   function pickPraise() {
     return PRAISE[(Math.random() * PRAISE.length) | 0];
   }
@@ -687,7 +816,8 @@
     game.usedHint = true;
     revealAnswer();
     $("#feedback").className = "feedback hint show";
-    $("#feedback").textContent = "Half points with a hint — still counts as practice.";
+    $("#feedback").textContent =
+      "Half points with a hint — still counts as practice.";
   }
   function showAnswer() {
     if (game.locked) return;
@@ -695,6 +825,19 @@
       // treat as a miss and drop into retype
       onWrong();
     }
+  }
+
+  // Move on without answering — no penalty beyond breaking the combo.
+  function skipCard() {
+    if (game.screen !== "play" || game.locked || !game.current) return;
+    game.locked = true;
+    clearTimeout(game.seqTimer);
+    game.combo = 0;
+    renderCombo();
+    clearMods();
+    sfx.click();
+    game.index += 1;
+    setTimeout(nextRound, 200);
   }
 
   function finishSession() {
@@ -716,7 +859,8 @@
   function renderResults() {
     const total = game.firstTryCorrect + game.misses;
     const acc = total ? Math.round((game.firstTryCorrect / total) * 100) : 100;
-    $("#results-world").textContent = WORLD_BY_ID[game.worldId].title + " complete!";
+    $("#results-world").textContent =
+      WORLD_BY_ID[game.worldId].title + " complete!";
     $("#stat-xp").textContent = "+" + game.xpGained.toLocaleString();
     $("#stat-acc").textContent = acc + "%";
     $("#stat-combo").textContent = game.maxCombo + "×";
@@ -753,10 +897,13 @@
     $("#rank-title").textContent = r.title;
     $("#rank-xp").textContent = store.xp.toLocaleString() + " XP";
     $("#rank-fill").style.width = Math.round(r.pct * 100) + "%";
-    $("#rank-next").textContent = r.next ? r.next.xp - store.xp + " XP to " + r.next.title : "Max rank reached 👑";
+    $("#rank-next").textContent = r.next
+      ? r.next.xp - store.xp + " XP to " + r.next.title
+      : "Max rank reached 👑";
 
     const masteredTotal = CARDS.filter((c) => isMastered(c.id)).length;
-    $("#stat-mastered-total").textContent = masteredTotal + " / " + CARDS.length;
+    $("#stat-mastered-total").textContent =
+      masteredTotal + " / " + CARDS.length;
 
     const grid = $("#world-grid");
     grid.innerHTML = "";
@@ -778,10 +925,19 @@
 
       const foot = el("div", "world-foot");
       if (unlocked) {
-        foot.appendChild(el("span", "world-count", prog.mastered + "/" + prog.total + " mastered"));
-        if (store.completed[w.id]) foot.appendChild(el("span", "world-badge", "✓ cleared"));
+        foot.appendChild(
+          el(
+            "span",
+            "world-count",
+            prog.mastered + "/" + prog.total + " mastered",
+          ),
+        );
+        if (store.completed[w.id])
+          foot.appendChild(el("span", "world-badge", "✓ cleared"));
       } else {
-        foot.appendChild(el("span", "world-lock", "🔒 clear the previous world"));
+        foot.appendChild(
+          el("span", "world-lock", "🔒 clear the previous world"),
+        );
       }
       tile.appendChild(foot);
 
@@ -790,10 +946,20 @@
     });
 
     // toggles reflect stored settings
-    $("#toggle-sound").setAttribute("aria-pressed", String(store.settings.sound));
-    $("#toggle-sound").textContent = store.settings.sound ? "🔊 Sound" : "🔇 Muted";
-    $("#toggle-motion").setAttribute("aria-pressed", String(store.settings.motion));
-    $("#toggle-motion").textContent = store.settings.motion ? "✨ Motion" : "🚫 Reduced";
+    $("#toggle-sound").setAttribute(
+      "aria-pressed",
+      String(store.settings.sound),
+    );
+    $("#toggle-sound").textContent = store.settings.sound
+      ? "🔊 Sound"
+      : "🔇 Muted";
+    $("#toggle-motion").setAttribute(
+      "aria-pressed",
+      String(store.settings.motion),
+    );
+    $("#toggle-motion").textContent = store.settings.motion
+      ? "✨ Motion"
+      : "🚫 Reduced";
   }
 
   function makeRing(pct, color) {
@@ -849,7 +1015,8 @@
         info.appendChild(el("span", "cheat-label", c.label));
         info.appendChild(el("span", "cheat-prompt", c.prompt));
         row.appendChild(info);
-        if (isMastered(c.id)) row.appendChild(el("span", "cheat-mastered", "★"));
+        if (isMastered(c.id))
+          row.appendChild(el("span", "cheat-mastered", "★"));
         section.appendChild(row);
       });
       container.appendChild(section);
@@ -869,17 +1036,12 @@
   function bind() {
     window.addEventListener("keydown", onKeyDown, true);
 
-    // Mobile: raise/keep the soft keyboard and read what it types.
+    // Touch: the on-screen keypad is the input method (see buildKeypad). The
+    // hidden field stays wired as a fallback for anything that focuses it.
     if (IS_TOUCH) document.body.classList.add("touch");
     const mobileInput = $("#mobile-input");
     if (mobileInput) mobileInput.addEventListener("input", onSoftInput);
-    // Tapping the card (or the explicit button) re-summons the keyboard if the
-    // field ever loses focus mid-session.
-    $("#card").addEventListener("click", summonKeyboard);
-    $("#btn-keyboard").onclick = function () {
-      this.blur();
-      summonKeyboard();
-    };
+    buildKeypad();
 
     $("#btn-start").onclick = quickPlay;
     $("#btn-cheat").onclick = () => {
@@ -893,12 +1055,14 @@
     $("#btn-hint").onclick = function () {
       this.blur();
       useHint();
-      summonKeyboard();
     };
     $("#btn-show").onclick = function () {
       this.blur();
       showAnswer();
-      summonKeyboard();
+    };
+    $("#btn-skip").onclick = function () {
+      this.blur();
+      skipCard();
     };
 
     $("#toggle-sound").onclick = () => {
@@ -912,7 +1076,9 @@
       renderHome();
     };
     $("#btn-reset").onclick = () => {
-      if (confirm("Reset all progress, XP and mastery? This can't be undone.")) {
+      if (
+        confirm("Reset all progress, XP and mastery? This can't be undone.")
+      ) {
         store = defaultState();
         save();
         renderHome();
