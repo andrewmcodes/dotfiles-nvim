@@ -4,6 +4,17 @@ A curated [lazy.nvim](https://github.com/folke/lazy.nvim) config built for a Rub
 
 One config runs in two places: **standalone Neovim** and **inside the [VSCode-Neovim](https://github.com/vscode-neovim/vscode-neovim) extension**. Heavy UI plugins are gated on `vim.g.vscode`, so VS Code keeps its own UI while Neovim still provides motions, text objects, surround, flash, and comments.
 
+## Documentation
+
+- [Getting started](docs/getting-started.md) — requirements, first launch, updating, backups
+- [Keymap reference](docs/keymaps.md) — the full cheatsheet
+- [Rails workflow](docs/rails-workflow.md) — ruby-lsp, formatting, navigation, RSpec
+- [JavaScript / React / Stimulus](docs/javascript.md) — vtsls, ESLint, Prettier, Jest
+- [AI workflow](docs/ai.md) — Copilot, Copilot Chat, Avante, CLI agents
+- [Using in VS Code](docs/vscode.md) — the VSCode-Neovim extension
+- [Troubleshooting](docs/troubleshooting.md) — common issues and fixes
+- [Plugin inventory](docs/plugins.md) — every plugin and where it's configured
+
 ## Requirements
 
 - Neovim **0.12+** (uses the native `vim.lsp.config`/`vim.lsp.enable` API).
@@ -38,7 +49,7 @@ lua/plugins/
   linting.lua            nvim-lint (markdownlint)
   git.lua                gitsigns, diffview, lazygit (via snacks)
   test.lua               neotest + neotest-rspec (bin/rspec) + neotest-jest (yarn jest)
-  ruby.lua               vim-rails, vim-projectionist, vim-bundler, vim-endwise
+  ruby.lua               vim-rails, projectionist, bundler, endwise, telescope-rails
   javascript.lua         nvim-ts-autotag (JSX/HTML/ERB tags)
   stimulus.lua           (empty — Stimulus is covered by stimulus_ls + treesitter)
   markdown.lua           render-markdown, markdown-preview
@@ -96,9 +107,13 @@ Leader is <kbd>Space</kbd>. Press <kbd>Space</kbd> and wait to see [which-key](h
 
 RSpec runs via `bin/rspec`, Jest via `yarn jest` — the adapter is chosen by filetype.
 
-### Rails (vim-rails)
+### Rails navigation
 
-`<leader>ra` alternate file, `<leader>rr` related file. Plus commands: `:A`, `:AV`, `:Emodel`, `:Eview`, `:Econtroller`, `:Emigration`, and `gf` on partials/associations. `.projections.json` is honored.
+Multiple, complementary layers (details in [docs/rails-workflow.md](docs/rails-workflow.md)):
+
+- **vim-rails**: `<leader>ra` alternate, `<leader>rr` related; `:A`, `:Emodel`, `:Eview`, `:Econtroller`, `:Emigration`; `gf` on partials/associations; `.projections.json` honored.
+- **telescope-rails** fuzzy pickers: `<leader>rm` models, `<leader>rc` controllers, `<leader>rv` views, `<leader>rs` specs, `<leader>ri` migrations, `<leader>rl` libs.
+- **ruby-lsp**: `gd` go-to-definition, `gr` references, `<leader>cs` workspace symbols, and Code Lens "jump to view"/route links via `<leader>cl`.
 
 ### AI
 
