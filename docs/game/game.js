@@ -408,6 +408,7 @@
     const w = WORLD_BY_ID[worldId];
     $("#play-world").textContent = w.icon + "  " + w.title;
     $("#play").style.setProperty("--accent", w.accent);
+    summonKeyboard(); // raise the soft keyboard on touch (we're in a tap gesture)
     nextRound();
   }
 
@@ -472,10 +473,20 @@
       quitToHome();
       return;
     }
+    // Soft keyboards (notably Android/GBoard) fire keydown with no usable key
+    // — keyCode 229, e.key "Unidentified", or mid-composition. Let those fall
+    // through to the hidden field's `input` event instead of a false miss, and
+    // don't preventDefault (so the character actually reaches the field).
+    if (e.isComposing || e.keyCode === 229 || e.key === "Unidentified") return;
     e.preventDefault(); // capture everything else so the browser doesn't hijack it
     if (e.repeat || game.locked) return;
+    feedChord(chordFromEvent(e));
+  }
 
-    const c = chordFromEvent(e);
+  // Feed one parsed chord into the current round — shared by the physical
+  // keyboard (onKeyDown) and the mobile soft-keyboard path (onSoftInput).
+  function feedChord(c) {
+    if (game.screen !== "play" || game.locked || !game.current) return;
     game.buffer.push(c);
     const bufCanon = game.buffer.map(canon);
     renderKeys($("#pressed"), game.buffer);
@@ -512,6 +523,51 @@
     // Wrong key.
     if (game.phase === "answer") return onWrong();
     return onRetypeMiss();
+  }
+
+  // Turn a single typed character into a chord (mobile soft-keyboard path).
+  function chordFromChar(ch) {
+    if (ch === " ") return chord(" ");
+    if (/[A-Z]/.test(ch)) return chord(ch.toLowerCase(), { shift: true });
+    return chord(ch);
+  }
+
+  // The hidden field only exists to open the on-screen keyboard; we read the
+  // characters it receives, feed them to the engine, then wipe it clean.
+  function onSoftInput(e) {
+    const field = $("#mobile-input");
+    if (field) field.value = "";
+    if (game.screen !== "play" || game.locked) return;
+    const type = e.inputType || "";
+    if (type.indexOf("delete") === 0) return; // backspace etc. — ignore
+    if (type === "insertLineBreak" || type === "insertParagraph") {
+      feedChord(chord("enter"));
+      return;
+    }
+    const data = e.data || "";
+    for (const ch of data) {
+      if (game.locked) break;
+      feedChord(chordFromChar(ch));
+    }
+  }
+
+  // Is this a touch-first device? (Governs the soft-keyboard affordances.)
+  const IS_TOUCH =
+    (window.matchMedia && window.matchMedia("(hover: none) and (pointer: coarse)").matches) ||
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0;
+
+  // Focus the hidden field to raise the soft keyboard. Must run inside a user
+  // gesture (tap) on mobile, or the browser refuses to show the keyboard.
+  function summonKeyboard() {
+    if (!IS_TOUCH || game.screen !== "play") return;
+    const field = $("#mobile-input");
+    if (!field) return;
+    try {
+      field.focus({ preventScroll: true });
+    } catch (e) {
+      field.focus();
+    }
   }
 
   function onCorrect() {
@@ -813,6 +869,18 @@
   function bind() {
     window.addEventListener("keydown", onKeyDown, true);
 
+    // Mobile: raise/keep the soft keyboard and read what it types.
+    if (IS_TOUCH) document.body.classList.add("touch");
+    const mobileInput = $("#mobile-input");
+    if (mobileInput) mobileInput.addEventListener("input", onSoftInput);
+    // Tapping the card (or the explicit button) re-summons the keyboard if the
+    // field ever loses focus mid-session.
+    $("#card").addEventListener("click", summonKeyboard);
+    $("#btn-keyboard").onclick = function () {
+      this.blur();
+      summonKeyboard();
+    };
+
     $("#btn-start").onclick = quickPlay;
     $("#btn-cheat").onclick = () => {
       renderCheatsheet();
@@ -825,10 +893,12 @@
     $("#btn-hint").onclick = function () {
       this.blur();
       useHint();
+      summonKeyboard();
     };
     $("#btn-show").onclick = function () {
       this.blur();
       showAnswer();
+      summonKeyboard();
     };
 
     $("#toggle-sound").onclick = () => {

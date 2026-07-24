@@ -743,6 +743,35 @@ body::before {
   display: none !important;
 }
 
+/* ── mobile soft-keyboard plumbing ───────────────────────────────────── */
+/* The hidden field that summons the on-screen keyboard. It must stay in the
+   layout (display:none would stop it opening the keyboard) but invisible and
+   un-tappable. 16px font-size stops iOS Safari from zooming when it focuses. */
+#mobile-input {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  opacity: 0;
+  font-size: 16px;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  pointer-events: none;
+}
+
+/* Controls that only make sense on touch devices (body.touch set in JS). */
+.touch-only {
+  display: none;
+}
+body.touch .touch-only {
+  display: inline-flex;
+}
+
 /* respect the OS / user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -752,6 +781,15 @@ body::before {
 }
 
 @media (max-width: 560px) {
+  #app {
+    padding: 16px 14px 44px;
+  }
+  .brand h1 {
+    font-size: 26px;
+  }
+  .card {
+    padding: 22px 16px;
+  }
   .card-prompt {
     font-size: 20px;
   }
@@ -760,5 +798,42 @@ body::before {
   }
   .cheat-keys {
     flex-basis: 130px;
+  }
+  /* Big, thumb-friendly primary actions that fill the width. */
+  .cta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cta-row .btn.big {
+    width: 100%;
+  }
+  .cta-row .hint-text {
+    text-align: center;
+  }
+  .btn.big {
+    font-size: 16px;
+    padding: 13px 18px;
+  }
+  /* Roomier keycaps so they're easy to read on a phone. */
+  .kc {
+    font-size: 16px;
+    min-width: 36px;
+    height: 42px;
+  }
+  .pressed {
+    gap: 8px;
+  }
+  .world-tile {
+    padding: 14px;
+  }
+  .play-foot {
+    flex-wrap: wrap;
+  }
+}
+
+/* Single-column worlds on the narrowest phones. */
+@media (max-width: 380px) {
+  #world-grid {
+    grid-template-columns: 1fr;
   }
 }

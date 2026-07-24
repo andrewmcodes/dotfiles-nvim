@@ -53,7 +53,7 @@
         <div class="cta-row">
           <button class="btn primary big" id="btn-start">▶ Start training</button>
           <button class="btn big" id="btn-cheat">📖 Cheat sheet</button>
-          <span class="hint-text">Tip: press the keys on your real keyboard. <kbd>Esc</kbd> quits a round.</span>
+          <span class="hint-text">Tip: press the keys on your keyboard. <kbd>Esc</kbd> quits. On a phone, tap the card to bring up the keyboard.</span>
         </div>
 
         <h2 class="section-h">Worlds</h2>
@@ -62,6 +62,20 @@
 
       <!-- ══════════════ PLAY ══════════════ -->
       <section id="play" class="screen">
+        <!-- Off-screen field whose only job is to summon the soft keyboard on
+             touch devices. Focused on a user tap; its input events feed the
+             engine for keyboards that don't emit usable keydowns (Android). -->
+        <input
+          id="mobile-input"
+          type="text"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="none"
+          spellcheck="false"
+          inputmode="text"
+          aria-hidden="true"
+          tabindex="-1"
+        />
         <div class="play-hud">
           <button class="btn ghost" id="play-back">← Quit</button>
           <span id="play-world">World</span>
@@ -84,6 +98,7 @@
         </div>
 
         <div class="play-foot">
+          <button class="btn ghost touch-only" id="btn-keyboard">⌨️ Keyboard</button>
           <button class="btn ghost" id="btn-hint">💡 Hint (½ points)</button>
           <button class="btn ghost" id="btn-show">👀 Show me</button>
         </div>

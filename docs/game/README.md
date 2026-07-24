@@ -2,6 +2,8 @@
 
 An interactive, ADHD-friendly game for burning this Neovim config's keymaps into muscle memory. It shows you a task ("Go to definition", "Jump to the model's spec") and you press the **real keys on your keyboard** — the game matches them against the actual binding from this config.
 
+Works on phones too: on a touch device the layout goes single-column and tapping the card (or the **⌨️ Keyboard** button) raises the on-screen keyboard so you can play anywhere.
+
 ## Play it
 
 Open `docs/game/index.html` in any browser. No build, no install, no internet — it's plain HTML/CSS/JS (no framework needed).
