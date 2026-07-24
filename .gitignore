@@ -1,7 +1,8 @@
+# lazy.nvim stores plugins/state outside this repo, so there's little to ignore.
+# NOTE: lazy-lock.json IS tracked on purpose — it pins plugin versions.
 tags
-test.sh
-.luarc.json
-nvim
-
+doc/tags
 spell/
-lazy-lock.json
+*.swp
+*.swo
+.DS_Store
