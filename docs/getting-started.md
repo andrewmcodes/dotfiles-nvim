@@ -29,7 +29,7 @@ Ruby tooling (`ruby-lsp`, `standardrb`, `rubocop`) comes from the project's own 
 ## First launch
 
 1. Open Neovim. lazy.nvim bootstraps itself and installs all plugins (progress in a floating window). If you ever need to redo this: `:Lazy sync`.
-2. Open any source file. [mason.nvim](https://github.com/mason-org/mason.nvim) auto-installs the language servers and CLI tools (`vtsls`, `eslint-lsp`, `stimulus-language-server`, `lua-language-server`, `marksman`, `stylua`, `shfmt`, `markdownlint`, …) with a progress indicator. This happens once.
+2. Open any source file. [mason.nvim](https://github.com/mason-org/mason.nvim) auto-installs the language servers and CLI tools (`vtsls`, `eslint-lsp`, `stimulus-language-server`, `herb-language-server`, `lua-language-server`, `marksman`, `stylua`, `shfmt`, `markdownlint`, …) with a progress indicator. This happens once.
 3. Sign in to Copilot: `:Copilot auth`.
 4. `blink.cmp` downloads its fuzzy-matching binary on the first insert (one-time, automatic).
 5. Verify: `:checkhealth`.
@@ -51,6 +51,18 @@ Once you're in a buffer, the essentials:
 - `<leader>?` — the cheatsheet: every keybinding, grouped and always up to date. When you forget a mapping, this is the answer. You can also just press `<leader>` and pause to let [which-key](https://github.com/folke/which-key.nvim) show what's available.
 
 See [keymaps.md](keymaps.md) for the complete reference.
+
+## New to Vim?
+
+Two safety nets worth knowing before anything else:
+
+- **`:Tutor`** — Neovim's built-in 30-minute interactive walkthrough of the core motions. It's the single best use of your first half hour; nothing here replaces it.
+- **`<leader>uu`** — the undo tree. Undo history persists across sessions, so if a stray keystroke mangled a file an hour ago, you can still see and recover every state.
+
+Two more that reduce the "what just happened" feeling:
+
+- **`<leader>qs`** reopens the project exactly as you left it — same buffers, same window layout.
+- Errors render in full underneath the cursor line rather than trailing off the edge of the window. `<leader>uv` switches to the compact form when the extra height is in the way.
 
 ## How the config loads
 

@@ -25,7 +25,7 @@ There is no build or test suite for the config itself. Working on it means editi
 
 `init.lua` sets leader keys, loads `config.options`, bootstraps lazy, then branches on `vim.g.vscode` (set by the VSCode-Neovim extension): standalone loads `config.keymaps` + `config.autocmds`; VS Code loads `config.vscode` instead, which maps the same leader keys to VS Code commands so muscle memory carries over.
 
-Nearly every plugin spec is gated with `cond = function() return not vim.g.vscode end`. Only lightweight editing plugins (mini.ai/surround/pairs, flash, comments, treesitter) load in both environments — VS Code owns the UI, LSP, files, and search. **When adding a plugin, decide which environment it belongs to and gate accordingly.** UI-only editor options in `config/options.lua` are likewise wrapped in `if not vim.g.vscode`.
+Nearly every plugin spec is gated with `cond = function() return not vim.g.vscode end`. Only four load in both environments — `mini.nvim` (ai/surround/pairs), `flash.nvim`, `ts-comments.nvim`, and `vim-repeat` — and `editing.lua` exists to hold exactly those, so specs in it must **not** be gated. Everything else, treesitter included, is gated off: VS Code owns the UI, LSP, files, search, and highlighting. **When adding a plugin, decide which environment it belongs to and gate accordingly.** UI-only editor options in `config/options.lua` are likewise wrapped in `if not vim.g.vscode`.
 
 ### Plugin specs
 
@@ -46,15 +46,25 @@ Two Ruby-specific details that are easy to break:
 
 - **ruby-lsp is NOT installed by Mason.** It comes from the project's own composed bundle (auto-loading `ruby-lsp-rails` + `ruby-lsp-rspec`). It's launched via `mise x -- ruby-lsp` so it runs under the project's pinned Ruby regardless of nvim's ambient `PATH` (bare `ruby-lsp` fallback when mise is absent).
 - A custom `vim.lsp.commands["rubyLsp.openFile"]` handler is registered so Code Lens "Jump to view" / route links work (ruby-lsp sends `file://…#Lnn` URIs).
+- **`ruby_lsp.cmd` must stay a function.** lspconfig's own spec starts the server with `cwd = config.cmd_cwd or config.root_dir`; replacing `cmd` with a plain table silently drops that, and `mise x` then resolves its Ruby from *nvim's* cwd instead of the Rails root — defeating the entire point of the wrapper. Don't override `reuse_client` either; it's what populates `cmd_cwd`.
+- **`herb_ls` is pinned to `eruby`.** Upstream defaults to `{ html, eruby }`, but the `html` server already owns HTML. Same split-ownership rule as `cssls`/`somesass_ls`.
+- Deliberately not enabled: `rubocop`/`standardrb` (ruby-lsp already runs Standard — would double-report), `sorbet`/`tailwindcss` (not in the stack).
 
 ### Formatting split (deliberate)
 
-`conform.nvim` (`formatting.lua`) formats JS/JSX/JSON/CSS/HTML/YAML/Markdown via Prettier, Lua via stylua, sh via shfmt — with `format_on_save` (respecting `:FormatDisable`/`:FormatEnable` toggles and `vim.g/b.disable_autoformat`). **Ruby and ERB are intentionally absent from conform** — they format through ruby-lsp. Don't add `ruby`/`eruby` to `formatters_by_ft`.
+`conform.nvim` (`formatting.lua`) formats JS/JSX/JSON/CSS/HTML/YAML/Markdown via Prettier, Lua via stylua, sh via shfmt — with `format_on_save` (respecting `:FormatDisable`/`:FormatEnable` toggles and `vim.g/b.disable_autoformat`).
+
+- **Ruby is intentionally absent from conform** — it formats through ruby-lsp (Standard/RuboCop). Don't add `ruby` to `formatters_by_ft`.
+- **ERB is NOT** — ruby-lsp has no ERB formatter, so `eruby` maps to `herb_format` (Herb's `herb-format`, defined inline since it isn't in conform's registry). That entry is a *function* that checks availability first, so a missing `herb-format` is a no-op rather than an error on every save.
 
 ### Filetypes & tests
 
-- `autocmds.lua` maps `*.erb` → `eruby` (so ruby-lsp, treesitter, and stimulus_ls behave). ERB filetype flows from that.
-- `test.lua` (neotest) picks the adapter by filetype: RSpec via `bin/rspec`, Jest via `yarn jest`.
+- `autocmds.lua` maps `*.erb` → `eruby` (so ruby-lsp, herb_ls, treesitter, and stimulus_ls behave). ERB filetype flows from that.
+- `test.lua` (neotest) picks the adapter by filetype: RSpec via `bin/rspec`, Jest via `yarn jest`. `<leader>td` uses `strategy = "dap"` and therefore depends on `dap.lua`.
+
+### Debugging
+
+`dap.lua` owns `<leader>d`: nvim-dap + nvim-dap-ruby (`rdbg` over TCP — ruby/debug does not speak DAP over stdio) + dap-ui + dap-virtual-text. dap-ui auto-opens on `event_initialized` and closes on terminate.
 
 ### Leader-key namespaces (which-key)
 
@@ -64,5 +74,7 @@ Two Ruby-specific details that are easy to break:
 
 - **Markdown**: do not hard-wrap prose — one physical line per paragraph/list item, soft-wrap in the editor.
 - **nvim-treesitter runs the rewritten `main` branch** (required on Neovim 0.12+; the old `master` `.configs` API is 0.11-only and frozen). Consequences that differ from most configs: the plugin is **not lazy-loaded** (`lazy = false`), there is no `ensure_installed`/`auto_install`/`.configs` module, and highlighting + indentation are enabled per-buffer via the core `vim.treesitter` API in a `FileType` autocmd (see `treesitter.lua`). Parsers compile locally, so it needs the **`tree-sitter` CLI** (installed via mise) plus a C compiler — launch nvim from a mise-activated shell (same requirement as ruby-lsp). `require('nvim-treesitter').install()` is idempotent (skips installed parsers). Non-1:1 filetype→parser mappings (`eruby`→`embedded_template`, `javascriptreact`→`javascript`) are registered explicitly; `jsonc` has no parser and highlights via `json`.
+- **Treesitter textobject/motion maps are set per buffer, not globally** (`treesitter.lua`). Neovim's shipped ftplugins — Ruby's in particular — define buffer-local `]m`/`[m`/`]M`/`[M`/`]]`/`[[` built on `searchsyn()` + syntax groups, and a buffer-local map always beats a global one. Global versions would be silently dead in exactly the filetype they matter most for. A `FileType` autocmd (deferred via `vim.schedule` so it lands after the ftplugin) applies them, plus a pass over already-loaded buffers since `FileType` has already fired for whatever triggered the plugin load.
+- **`matchit`/`matchparen` stay in `disabled_plugins`** because `vim-matchup` replaces both. Don't re-enable them; do keep matchup, or Ruby loses `%` on `def`…`end` entirely.
 - **AI is subscription-based; no model API keys.** Copilot powers inline suggestions, chat, and (by default) Avante. `ai.lua` documents a commented ACP block to drive Avante through the Claude CLI instead.
 - **Requires Neovim 0.12+** for the native `vim.lsp.config`/`vim.lsp.enable` API.

@@ -4,7 +4,7 @@ A curated [lazy.nvim](https://github.com/folke/lazy.nvim) config built for a Rub
 
 One config runs in two places: **standalone Neovim** and **inside the [VSCode-Neovim](https://github.com/vscode-neovim/vscode-neovim) extension**. Heavy UI plugins are gated on `vim.g.vscode`, so VS Code keeps its own UI while Neovim still provides motions, text objects, surround, flash, and comments.
 
-> 🎮 **[Play Keycombat](https://andrewmcodes.github.io/dotfiles-nvim/)** — an interactive, ADHD-friendly game that drills these keymaps into muscle memory (Rails-developer moves first). Runs right in the browser. Source in [`docs/game/`](docs/game/).
+> 🎮 **[Play Keycombat](https://andrewmcodes.github.io/dotfiles-nvim/)** — an interactive, ADHD-friendly game that drills these keymaps into muscle memory (Rails-developer moves first): 11 worlds, 96 bindings, from Daily Drivers through Ruby Surgery and the Debugger. Runs right in the browser. Source in [`docs/game/`](docs/game/).
 
 ## Documentation
 
@@ -45,19 +45,23 @@ lua/config/
 lua/plugins/
   colorscheme.lua        onedarkpro (active) + tokyonight/catppuccin (available)
   ui.lua                 snacks, lualine, bufferline, which-key, noice
-  editor.lua             telescope, neo-tree, trouble, todo-comments, flash
-  treesitter.lua         syntax + indent (the rewritten `main` branch; Neovim 0.12+)
+  editor.lua             telescope, neo-tree, trouble, todo-comments, flash, matchup,
+                         undotree, persistence
+  treesitter.lua         syntax + indent + textobjects (rewritten `main`; Neovim 0.12+)
   editing.lua            mini.ai/surround/pairs, ts-comments, vim-repeat (both envs)
-  lsp.lua                nvim-lspconfig + mason; ruby_lsp, vtsls, eslint, stimulus_ls, ...
-  completion.lua         blink.cmp (+ Copilot source)
-  formatting.lua         conform.nvim (prettier / stylua / shfmt; Ruby via ruby-lsp)
+  lsp.lua                nvim-lspconfig + mason; ruby_lsp, herb_ls, vtsls, eslint, ...
+  completion.lua         blink.cmp (+ Copilot source, Rails/RSpec snippets)
+  formatting.lua         conform.nvim (prettier / stylua / shfmt / herb-format)
   linting.lua            nvim-lint (markdownlint)
   git.lua                gitsigns, diffview, lazygit (via snacks)
   test.lua               neotest + neotest-rspec (bin/rspec) + neotest-jest (yarn jest)
-  ruby.lua               vim-rails, projectionist, bundler, endwise, telescope-rails
+  dap.lua                nvim-dap + nvim-dap-ruby (rdbg), dap-ui, virtual text
+  ruby.lua               vim-rails, projectionist, bundler, endwise, Rails pickers +
+                         bin/rails commands
   javascript.lua         nvim-ts-autotag (JSX/HTML/ERB tags)
   stimulus.lua           (empty — Stimulus is covered by stimulus_ls + treesitter)
   markdown.lua           render-markdown, markdown-preview
+  obsidian.lua           obsidian.nvim (digital-brain vault)
   ai.lua                 copilot.lua, CopilotChat, avante, CLI-agent terminals
 ```
 
@@ -117,8 +121,18 @@ RSpec runs via `bin/rspec`, Jest via `yarn jest` — the adapter is chosen by fi
 Multiple, complementary layers (details in [docs/rails-workflow.md](docs/rails-workflow.md)):
 
 - **vim-rails**: `<leader>ra` alternate, `<leader>rr` related; `:A`, `:Emodel`, `:Eview`, `:Econtroller`, `:Emigration`; `gf` on partials/associations; `.projections.json` honored.
-- **telescope-rails** fuzzy pickers: `<leader>rm` models, `<leader>rc` controllers, `<leader>rv` views, `<leader>rs` specs, `<leader>ri` migrations, `<leader>rl` libs.
+- **Resource pickers**: `<leader>rm` models, `rc` controllers, `rv` views, `rs` specs, `ri` migrations, `rl` libs, `rj` jobs, `rn` mailers, `ru` components, `rt` Stimulus controllers, `rd` schema.
+- **Running Rails**: `<leader>rR` routes picker (jumps to the action), `rC` console, `rM` `db:migrate`, `rG` generate.
 - **ruby-lsp**: `gd` go-to-definition, `gr` references, `<leader>cs` workspace symbols, and Code Lens "jump to view"/route links via `<leader>cl`.
+- **Ruby motions**: `%` jumps `def`↔`end`, `dam` deletes a whole method, `]m`/`[m` step between methods.
+
+### ERB
+
+`herb_ls` parses the HTML and the ERB together, so unclosed tags and a missing `<% end %>` surface as ordinary diagnostics — things ruby-lsp can't see. `herb-format` formats views on save once [installed](docs/setup.md#erb-formatting-optional).
+
+### Debugging
+
+Breakpoint debugging for Ruby via nvim-dap + `rdbg`: `<leader>db` breakpoint, `<leader>dc` start/continue, `<leader>di`/`do`/`dO` step, `<leader>du` toggle UI. `<leader>td` debugs the nearest spec. Variable values render inline as you step.
 
 ### AI
 
@@ -137,7 +151,9 @@ Run `:Copilot auth` once to sign in. Avante defaults to the Copilot provider; to
 
 ### Editing & windows
 
-`s`/`S` flash jump, `sa`/`sd`/`sr` surround add/delete/replace, `gc`/`gcc` comment, `<C-s>` save, `<C-h/j/k/l>` window navigation, `<A-j>`/`<A-k>` move lines, `<leader>uw/us/ul/ud/un` UI toggles, `<leader>l` Lazy, `<leader>qq` quit all.
+`s`/`S` flash jump, `sa`/`sd`/`sr` surround add/delete/replace, `gc`/`gcc` comment, `<C-s>` save, `<C-h/j/k/l>` window navigation, `<A-j>`/`<A-k>` move lines, `<leader>uw/us/ul/ud/uv/un` UI toggles, `<leader>uu` undo tree, `<leader>l` Lazy, `<leader>qq` quit all.
+
+Sessions: `<leader>qs` reopens this project exactly as you left it (buffers + window layout), `<leader>ql` restores the last session anywhere.
 
 ## VS Code
 

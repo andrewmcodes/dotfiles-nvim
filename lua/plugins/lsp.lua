@@ -26,12 +26,15 @@ return {
           "vtsls",
           "eslint-lsp",
           "stimulus-language-server",
+          "herb-language-server",
           "css-lsp",
+          "some-sass-language-server",
           "html-lsp",
           "json-lsp",
           "yaml-language-server",
           "marksman",
           "bash-language-server",
+          "dockerfile-language-server",
           "taplo",
           -- Formatters / linters used by conform.nvim + nvim-lint
           "stylua",
@@ -61,7 +64,16 @@ return {
         ruby_lsp_cmd = { "mise", "x", "--", "ruby-lsp" }
       end
       vim.lsp.config("ruby_lsp", {
-        cmd = ruby_lsp_cmd,
+        -- MUST stay a function, not a plain `cmd` table. lspconfig's own ruby_lsp
+        -- spec starts the server with `cwd = root_dir`; a table override drops that
+        -- and `mise x` would then resolve its Ruby from *nvim's* cwd instead of the
+        -- Rails root — the exact failure this wrapper exists to prevent (launch nvim
+        -- from ~/git, edit ~/git/podia/app/models/user.rb, get the wrong Ruby).
+        -- `reuse_client` is inherited from lspconfig and is what sets `cmd_cwd`.
+        cmd = function(dispatchers, config)
+          local cwd = config and (config.cmd_cwd or config.root_dir)
+          return vim.lsp.rpc.start(ruby_lsp_cmd, dispatchers, cwd and { cwd = cwd } or nil)
+        end,
         filetypes = { "ruby", "eruby" },
         init_options = {
           formatter = "auto",
@@ -178,19 +190,47 @@ return {
         },
       })
 
-      -- Enable all servers (cssls/html/bashls/taplo/marksman/stimulus_ls use defaults).
+      -- Stylesheets: split ownership so scss/sass don't get double diagnostics +
+      -- completion. cssls handles plain css/less; some-sass owns scss AND indented
+      -- sass, giving cross-partial variable/mixin/placeholder intelligence that
+      -- cssls lacks — important given Podia's large Sass/SCSS frontend.
+      vim.lsp.config("cssls", {
+        filetypes = { "css", "less" },
+      })
+      vim.lsp.config("somesass_ls", {
+        filetypes = { "scss", "sass" },
+      })
+
+      -- ERB: Herb is an HTML-aware ERB toolchain — it catches unclosed tags and
+      -- mismatched `<% end %>` that ruby-lsp (which only reasons about the embedded
+      -- Ruby) cannot see. Same split-ownership rule as the stylesheets above:
+      -- lspconfig's default is { "html", "eruby" }, but the `html` server already
+      -- owns plain HTML, so restrict Herb to eruby to avoid double diagnostics.
+      --
+      -- An .erb buffer therefore has three clients, each with a distinct job:
+      --   ruby_lsp    — the embedded Ruby (completion, goto, hover)
+      --   herb_ls     — HTML+ERB structure (tag/block diagnostics, symbols)
+      --   stimulus_ls — data-controller/target/action attributes
+      vim.lsp.config("herb_ls", {
+        filetypes = { "eruby" },
+      })
+
+      -- Enable all servers (html/bashls/taplo/marksman/stimulus_ls/dockerls use defaults).
       vim.lsp.enable({
         "lua_ls",
         "ruby_lsp",
+        "herb_ls",
         "vtsls",
         "eslint",
         "stimulus_ls",
         "cssls",
+        "somesass_ls",
         "html",
         "jsonls",
         "yamlls",
         "marksman",
         "bashls",
+        "dockerls",
         "taplo",
       })
 
@@ -207,9 +247,18 @@ return {
             [vim.diagnostic.severity.HINT] = "󰌶 ",
           },
         } or {},
+        -- Readability split (native, Neovim 0.11+; this is what replaced lsp_lines):
+        -- other lines get a compact inline marker, while the line under the cursor
+        -- renders the FULL wrapped message underneath. Long Standard/RuboCop offenses
+        -- are otherwise truncated at the window edge and unreadable.
+        -- Toggle with <leader>uv (ui.lua).
         virtual_text = {
           source = "if_many",
           spacing = 2,
+          current_line = false,
+        },
+        virtual_lines = {
+          current_line = true,
         },
       })
 

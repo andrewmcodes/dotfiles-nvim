@@ -86,6 +86,27 @@ return {
       snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
       snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>ul")
       snacks.toggle.diagnostics():map("<leader>ud")
+
+      -- Full multi-line diagnostics under the cursor line vs. the compact inline
+      -- marker. lsp.lua enables virtual_lines for the current line by default;
+      -- this flips both back and forth when the extra height gets in the way.
+      snacks.toggle
+        .new({
+          name = "Diagnostic Virtual Lines",
+          get = function()
+            local cfg = vim.diagnostic.config() or {}
+            return cfg.virtual_lines ~= false
+          end,
+          set = function(enabled)
+            vim.diagnostic.config({
+              virtual_lines = enabled and { current_line = true } or false,
+              virtual_text = enabled and { source = "if_many", spacing = 2, current_line = false }
+                or { source = "if_many", spacing = 2 },
+            })
+          end,
+        })
+        :map("<leader>uv")
+
       vim.keymap.set("n", "<leader>un", function()
         snacks.notifier.hide()
       end, { desc = "Dismiss Notifications" })
@@ -188,8 +209,10 @@ return {
         { "<leader>f", group = "Find" },
         { "<leader>s", group = "Search" },
         { "<leader>c", group = "Code" },
+        { "<leader>d", group = "Debug" },
         { "<leader>g", group = "Git" },
         { "<leader>gh", group = "Hunks" },
+        { "<leader>q", group = "Quit / Session" },
         { "<leader>t", group = "Test" },
         { "<leader>a", group = "AI" },
         { "<leader>A", group = "Avante" },

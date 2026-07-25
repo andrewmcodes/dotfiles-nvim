@@ -54,7 +54,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "neotest-summary",
     "neotest-output-panel",
     "copilot-chat",
-    "dbout",
+    "dap-float",
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false

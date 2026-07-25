@@ -13,6 +13,22 @@ Cause: ruby-lsp ran under the wrong Ruby. This config launches it as `mise x -- 
 3. Open Neovim from inside the project directory so `mise` resolves the right config.
 4. If the composed bundle is stale, delete `.ruby-lsp/` in the project and reopen — ruby-lsp regenerates it.
 
+If it attaches but resolves the *wrong* Ruby specifically when you launched nvim from outside the project (e.g. `cd ~/git && nvim podia/app/models/user.rb`), check that `ruby_lsp`'s `cmd` in `lua/plugins/lsp.lua` is still a **function**. lspconfig starts the server with `cwd = root_dir`; replacing `cmd` with a plain table drops that, and `mise` then resolves from nvim's working directory instead of the Rails root.
+
+## ERB: no diagnostics, or views aren't formatted
+
+- **No tag/block diagnostics** — `herb_ls` isn't running. Check `:LspInfo` in an `.erb` buffer (you should see `ruby_lsp`, `herb_ls`, `stimulus_ls`), then `:Mason` for `herb-language-server`.
+- **Views aren't formatted on save** — that's expected until `herb-format` is installed; it's a deliberate no-op rather than an error. See [setup.md](setup.md#erb-formatting-optional). Confirm with `:ConformInfo`, which lists `herb_format` and whether it resolved.
+- **Formatting mangled a view** — Herb's formatter is an experimental preview upstream. `:FormatDisable!` opts the current buffer out, `:FormatDisable` turns it off globally; then `u` to undo.
+
+## `%` doesn't jump between `def` and `end`
+
+`vim-matchup` provides this, and `matchit`/`matchparen` are intentionally disabled in `lua/config/lazy.lua` because matchup replaces them. If `%` stops working, matchup failed to load — check `:Lazy` for it. Re-enabling `matchit` instead is not a fix; the two conflict.
+
+## `]m` / `[[` move by syntax rather than treesitter
+
+Those maps are set **per buffer** so they override Neovim's shipped Ruby ftplugin, which defines its own syntax-based versions. If `:verbose nmap ]m` shows a `searchsyn()` right-hand side instead of `Next method start`, `nvim-treesitter-textobjects` didn't attach to that buffer — usually because no parser is installed for its filetype (`:checkhealth vim.treesitter`).
+
 ## Language servers / formatters missing
 
 Mason installs them on first file open. If something's absent:

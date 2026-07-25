@@ -25,6 +25,9 @@ local ensure_installed = {
   "scss",
   "json", -- also highlights the `jsonc` filetype; there is no separate jsonc parser on `main`
   "yaml",
+  "toml", -- fnox.toml, mise.toml, pitchfork.toml, .yarnrc, etc.
+  "sql", -- raw .sql files under the Rails app
+  "dockerfile", -- .devcontainer/Dockerfile
   "markdown",
   "markdown_inline",
   "lua",
@@ -86,6 +89,87 @@ return {
           end
         end,
       })
+    end,
+  },
+
+  -- Method/class textobjects. mini.ai (editing.lua) deliberately uses only built-in,
+  -- non-treesitter specs so it survives the VS Code gate — which means Ruby has no
+  -- `def`-level or `class`-level textobject at all without this. `dam` on a method,
+  -- `]m` to the next one.
+  --
+  -- `branch = "main"` is the rewrite that pairs with nvim-treesitter's main branch
+  -- above; it registers no keymaps of its own, so they're wired explicitly below.
+  -- Keys avoid mini.ai's claimed set (it uses f/a/t/q/b — not m/c).
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main",
+    event = { "BufReadPost", "BufNewFile" },
+    cond = not_vscode,
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("nvim-treesitter-textobjects").setup({
+        select = { lookahead = true },
+        move = { set_jumps = true }, -- keep <C-o>/<C-i> working across these jumps
+      })
+
+      local select = require("nvim-treesitter-textobjects.select")
+      local move = require("nvim-treesitter-textobjects.move")
+
+      -- m = method, c = class. Both are free: mini.ai claims f/a/t/q/b, not m/c.
+      local textobjects = {
+        { { "x", "o" }, "am", "Method (outer)", select.select_textobject, "@function.outer" },
+        { { "x", "o" }, "im", "Method (inner)", select.select_textobject, "@function.inner" },
+        { { "x", "o" }, "ac", "Class (outer)", select.select_textobject, "@class.outer" },
+        { { "x", "o" }, "ic", "Class (inner)", select.select_textobject, "@class.inner" },
+        { { "x", "o" }, "aa", "Parameter (outer)", select.select_textobject, "@parameter.outer" },
+        { { "x", "o" }, "ia", "Parameter (inner)", select.select_textobject, "@parameter.inner" },
+        { { "n", "x", "o" }, "]m", "Next method start", move.goto_next_start, "@function.outer" },
+        { { "n", "x", "o" }, "]M", "Next method end", move.goto_next_end, "@function.outer" },
+        { { "n", "x", "o" }, "[m", "Prev method start", move.goto_previous_start, "@function.outer" },
+        { { "n", "x", "o" }, "[M", "Prev method end", move.goto_previous_end, "@function.outer" },
+        { { "n", "x", "o" }, "]]", "Next class start", move.goto_next_start, "@class.outer" },
+        { { "n", "x", "o" }, "[[", "Prev class start", move.goto_previous_start, "@class.outer" },
+      }
+
+      -- These MUST be buffer-local. Neovim's shipped Ruby ftplugin already defines
+      -- buffer-local ]m/[m/]M/[M/]]/[[ built on `searchsyn()` + syntax groups, and a
+      -- buffer-local map always beats a global one — so global versions of these
+      -- would be silently dead in Ruby, the one filetype they matter most for.
+      -- Setting them per-buffer overrides the ftplugin and makes them treesitter
+      -- accurate instead of regex/syntax accurate.
+      local function set_textobject_maps(buf)
+        if not vim.api.nvim_buf_is_valid(buf) or vim.bo[buf].filetype == "" then
+          return
+        end
+        -- Only where a parser is actually available, so we never shadow a working
+        -- ftplugin map with one that can't resolve a query.
+        if not vim.treesitter.get_parser(buf, nil, { error = false }) then
+          return
+        end
+        for _, spec in ipairs(textobjects) do
+          local mode, lhs, desc, fn, query = spec[1], spec[2], spec[3], spec[4], spec[5]
+          vim.keymap.set(mode, lhs, function()
+            fn(query, "textobjects")
+          end, { buffer = buf, desc = desc })
+        end
+      end
+
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("config_treesitter_textobjects", { clear = true }),
+        callback = function(ev)
+          -- Deferred so this lands after the shipped ftplugin has set its own maps.
+          vim.schedule(function()
+            set_textobject_maps(ev.buf)
+          end)
+        end,
+      })
+
+      -- FileType already fired for whatever buffer triggered this plugin's load.
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_loaded(buf) then
+          set_textobject_maps(buf)
+        end
+      end
     end,
   },
 }

@@ -33,6 +33,21 @@ Leader is <kbd>Space</kbd>. Press <kbd>Space</kbd> and pause to let [which-key](
 | `sr{old}{new}` | n | Surround replace |
 | `a`/`i` + `w b q ( [ { t …` | o/x | mini.ai text objects (word, function call, quotes, tags, …) |
 
+## Code structure (treesitter — standalone Neovim only)
+
+Buffer-local, so they override the equivalents that Neovim's shipped ftplugins define.
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `%` | n/x/o | Jump between `def`/`if`/`do`/`class` and its `end` |
+| `]%` `[%` | n/x/o | Next / previous unmatched block delimiter |
+| `am` / `im` | o/x | Method — outer / inner (`dam` deletes a whole `def`…`end`) |
+| `ac` / `ic` | o/x | Class — outer / inner |
+| `aa` / `ia` | o/x | Parameter — outer / inner |
+| `]m` `[m` | n/x/o | Next / previous method start |
+| `]M` `[M` | n/x/o | Next / previous method end |
+| `]]` `[[` | n/x/o | Next / previous class start |
+
 ## Files & search (Telescope)
 
 | Key | Action |
@@ -130,7 +145,7 @@ Leader is <kbd>Space</kbd>. Press <kbd>Space</kbd> and pause to let [which-key](
 | `<leader>tO` | Toggle output panel |
 | `<leader>tw` | Toggle watch mode |
 | `<leader>tS` | Stop |
-| `<leader>td` | Debug nearest test |
+| `<leader>td` | Debug nearest test (opens the debugger — see [Debug](#debug-nvim-dap)) |
 
 ## AI
 
@@ -170,9 +185,54 @@ Standalone Neovim only (gated off under VS Code). Group label: **Obsidian**.
 | `<leader>ox` | Toggle checkbox |
 | `<leader>og` | Follow link under cursor |
 
-## Rails (vim-rails)
+## Rails
 
-`<leader>ra` alternate file, `<leader>rr` related file (vim-rails). Fuzzy resource pickers (telescope-rails): `<leader>rm` models, `<leader>rc` controllers, `<leader>rv` views, `<leader>rs` specs, `<leader>ri` migrations, `<leader>rl` libs. Commands: `:A`, `:AV`, `:AS`, `:R`, `:Emodel`, `:Eview`, `:Econtroller`, `:Emigration`, `:Rails`. `gf` jumps to partials, associations, and requires. See [rails-workflow.md](rails-workflow.md).
+Navigation (vim-rails): `<leader>ra` alternate file, `<leader>rr` related file. Commands: `:A`, `:AV`, `:AS`, `:R`, `:Emodel`, `:Eview`, `:Econtroller`, `:Emigration`, `:Rails`. `gf` jumps to partials, associations, and requires.
+
+Resource pickers (all resolve the Rails root from the current buffer):
+
+| Key | Picker | Key | Picker |
+| --- | --- | --- | --- |
+| `<leader>rm` | Models | `<leader>rj` | Jobs |
+| `<leader>rc` | Controllers | `<leader>rn` | Mailers |
+| `<leader>rv` | Views | `<leader>ru` | ViewComponents |
+| `<leader>rs` | Specs | `<leader>rt` | Stimulus controllers |
+| `<leader>ri` | Migrations | `<leader>rd` | `db/schema.rb` |
+| `<leader>rl` | Libs | | |
+
+Running Rails:
+
+| Key | Action |
+| --- | --- |
+| `<leader>rR` | Routes picker → jump to the controller action |
+| `<leader>rC` | `bin/rails console` |
+| `<leader>rM` | `bin/rails db:migrate` |
+| `<leader>rG` | `bin/rails generate …` |
+
+See [rails-workflow.md](rails-workflow.md).
+
+## Debug (nvim-dap)
+
+| Key | Action |
+| --- | --- |
+| `<leader>db` | Toggle breakpoint |
+| `<leader>dB` | Conditional breakpoint |
+| `<leader>dc` | Start / continue |
+| `<leader>di` `<leader>do` `<leader>dO` | Step into / over / out |
+| `<leader>dK` | Inspect value under cursor |
+| `<leader>dr` | Toggle REPL |
+| `<leader>du` | Toggle debug UI |
+| `<leader>dl` | Run last |
+| `<leader>dt` | Terminate |
+
+## Sessions & quit
+
+| Key | Action |
+| --- | --- |
+| `<leader>qq` | Quit all |
+| `<leader>qs` | Restore this directory's session |
+| `<leader>ql` | Restore the last session |
+| `<leader>qd` | Don't save the current session |
 
 ## UI toggles
 
@@ -182,6 +242,8 @@ Standalone Neovim only (gated off under VS Code). Group label: **Obsidian**.
 | `<leader>us` | Toggle spelling |
 | `<leader>ul` | Toggle relative number |
 | `<leader>ud` | Toggle diagnostics |
+| `<leader>uv` | Toggle full multi-line diagnostics on the cursor line |
+| `<leader>uu` | Undo tree |
 | `<leader>un` | Dismiss notifications |
 
 ## Completion menu (blink.cmp — insert mode)

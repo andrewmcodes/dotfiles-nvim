@@ -1,4 +1,5 @@
--- Editor tooling: telescope, neo-tree, trouble, todo-comments, flash.
+-- Editor tooling: telescope, neo-tree, trouble, todo-comments, flash, matchup,
+-- undotree, persistence.
 -- Most are gated off under VS Code; flash is NOT (works in both — see build contract).
 local function not_vscode()
   return not vim.g.vscode
@@ -225,6 +226,70 @@ return {
       },
       { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Search Todos" },
       { "<leader>xt", "<cmd>Trouble todo toggle<cr>", desc = "Todos (Trouble)" },
+    },
+  },
+
+  -- Restores `%` on Ruby's def/if/do/class → end, which this config would otherwise
+  -- lack entirely: config/lazy.lua disables both `matchit` (the runtime plugin that
+  -- consumes Ruby's ftplugin `b:match_words`) and `matchparen`. matchup supersedes
+  -- both, is treesitter-aware, and adds `]%`/`[%` motions plus `i%`/`a%` textobjects.
+  -- Gated: VS Code has its own bracket matching.
+  {
+    "andymass/vim-matchup",
+    event = { "BufReadPost", "BufNewFile" },
+    cond = not_vscode,
+    init = function()
+      -- Offscreen match shown in the statusline area rather than a popup, which
+      -- otherwise fights noice/lualine.
+      vim.g.matchup_matchparen_offscreen = { method = "status_manual" }
+      vim.g.matchup_matchparen_deferred = 1 -- don't recompute on every cursor move
+    end,
+  },
+
+  -- Visual undo history. `undofile` is on (config/options.lua), so the history
+  -- already persists across sessions — this is the only way to actually see it.
+  {
+    "mbbill/undotree",
+    cmd = { "UndotreeToggle", "UndotreeShow" },
+    cond = not_vscode,
+    keys = {
+      { "<leader>uu", "<cmd>UndotreeToggle<cr>", desc = "Undo Tree" },
+    },
+    init = function()
+      vim.g.undotree_WindowLayout = 2
+      vim.g.undotree_SetFocusWhenToggle = 1
+    end,
+  },
+
+  -- Session restore, scoped per directory — reopening a project brings back the
+  -- buffers and window layout instead of an empty dashboard.
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre",
+    cond = not_vscode,
+    opts = {},
+    keys = {
+      {
+        "<leader>qs",
+        function()
+          require("persistence").load()
+        end,
+        desc = "Restore Session (this dir)",
+      },
+      {
+        "<leader>ql",
+        function()
+          require("persistence").load({ last = true })
+        end,
+        desc = "Restore Last Session",
+      },
+      {
+        "<leader>qd",
+        function()
+          require("persistence").stop()
+        end,
+        desc = "Don't Save Current Session",
+      },
     },
   },
 

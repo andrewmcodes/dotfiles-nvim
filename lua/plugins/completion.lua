@@ -50,6 +50,17 @@ return {
             score_offset = 100,
             async = true,
           },
+          -- friendly-snippets files them under languages that no Neovim buffer ever
+          -- has: frameworks/rails.json -> "rails", ruby/rspec.json -> "rspec". Without
+          -- this mapping every Rails and RSpec snippet (~350) is silently unreachable.
+          snippets = {
+            opts = {
+              extended_filetypes = {
+                ruby = { "rails", "rspec" },
+                eruby = { "rails" },
+              },
+            },
+          },
         },
       },
       signature = {

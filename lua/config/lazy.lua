@@ -29,12 +29,15 @@ require("lazy").setup({
     rtp = {
       disabled_plugins = {
         "gzip",
+        -- matchit/matchparen stay off because vim-matchup (editor.lua) replaces
+        -- both — it wants matchparen disabled and supersedes matchit's `%`.
         "matchit",
         "matchparen",
         "netrwPlugin",
         "tarPlugin",
         "tohtml",
-        "tutor",
+        -- NOTE: `tutor` is deliberately NOT disabled — `:Tutor` is the built-in
+        -- 30-minute Vim walkthrough and the first thing to point a beginner at.
         "zipPlugin",
       },
     },

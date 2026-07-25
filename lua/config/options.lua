@@ -56,6 +56,10 @@ if not vim.g.vscode then
   opt.foldtext = ""
 end
 
+-- This config assumes a Nerd Font (lualine, devicons, the dashboard and the
+-- diagnostic signs in lsp.lua all key off it). Set it before any plugin reads it.
+vim.g.have_nerd_font = true
+
 -- Trim a couple of unused providers to cut startup + :checkhealth noise.
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0

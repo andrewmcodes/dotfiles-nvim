@@ -24,7 +24,11 @@ Every plugin, where it's configured, and what it does. Each `lua/plugins/*.lua` 
 | `folke/trouble.nvim` | Diagnostics / symbols / quickfix list (`<leader>x`) |
 | `folke/todo-comments.nvim` | Highlight + navigate TODO/FIXME/etc. |
 | `folke/flash.nvim` | Jump-to-anywhere motions (`s`/`S`) — loads in VS Code too |
+| `andymass/vim-matchup` | `%` on Ruby `def`/`if`/`do` → `end`, `]%`/`[%`, `i%`/`a%` (replaces the disabled `matchit`/`matchparen`) |
+| `mbbill/undotree` | Visual undo history browser (`<leader>uu`) |
+| `folke/persistence.nvim` | Per-directory session restore (`<leader>qs`/`ql`) |
 | `nvim-treesitter/nvim-treesitter` (`main` branch) | Syntax highlighting + indentation (not lazy-loaded; parsers compiled via the `tree-sitter` CLI) |
+| `nvim-treesitter/nvim-treesitter-textobjects` (`main` branch) | Method/class/parameter textobjects + motions (`am`/`ic`, `]m`/`[[`) |
 | `echasnovski/mini.nvim` | `mini.ai` text objects, `mini.surround`, `mini.pairs` — loads in VS Code too |
 | `folke/ts-comments.nvim` | Treesitter-aware `gc`/`gcc` commenting — loads in VS Code too |
 | `tpope/vim-repeat` | `.` repeat for plugin maps — loads in VS Code too |
@@ -39,10 +43,17 @@ Every plugin, where it's configured, and what it does. Each `lua/plugins/*.lua` 
 | `j-hui/fidget.nvim` | LSP progress UI |
 | `b0o/schemastore.nvim` | JSON/YAML schemas |
 | `saghen/blink.cmp` (+ friendly-snippets, blink-copilot) | Completion menu with Copilot source |
-| `stevearc/conform.nvim` | Formatting (Prettier / stylua / shfmt); Ruby via ruby-lsp |
+| `stevearc/conform.nvim` | Formatting (Prettier / stylua / shfmt / herb-format); Ruby via ruby-lsp |
 | `mfussenegger/nvim-lint` | Markdown linting (markdownlint) |
 
-Servers enabled: `ruby_lsp` (via `mise x`), `vtsls`, `eslint`, `stimulus_ls`, `lua_ls`, `jsonls`, `yamlls`, `cssls`, `html`, `marksman`, `bashls`, `taplo`.
+Servers enabled: `ruby_lsp` (via `mise x`), `herb_ls` (ERB), `vtsls`, `eslint`, `stimulus_ls`, `lua_ls`, `jsonls`, `yamlls`, `cssls` (css/less), `somesass_ls` (scss/sass), `html`, `marksman`, `bashls`, `dockerls`, `taplo`.
+
+Two filetypes have deliberately split server ownership, to avoid duplicate diagnostics and completions:
+
+- **Stylesheets** — `cssls` handles plain `css`/`less`; `somesass_ls` owns `scss` and indented `sass` (cross-partial variable/mixin intelligence). Enabling both on `scss` would double up.
+- **ERB** — `herb_ls` defaults to `{ html, eruby }` upstream, but is pinned to `eruby` only here because the `html` server already owns plain HTML. An `.erb` buffer therefore runs three servers with distinct jobs: `ruby_lsp` (the embedded Ruby), `herb_ls` (HTML+ERB structure), `stimulus_ls` (`data-*` attributes).
+
+Not enabled, on purpose: `rubocop`/`standardrb` (ruby-lsp already runs Standard via its RuboCop addon — adding these double-reports every offense), and `sorbet`/`tailwindcss` (not part of the Podia stack).
 
 ## Languages — `ruby.lua`, `javascript.lua`, `stimulus.lua`, `markdown.lua`, `obsidian.lua`
 
@@ -50,7 +61,7 @@ Servers enabled: `ruby_lsp` (via `mise x`), `vtsls`, `eslint`, `stimulus_ls`, `l
 | --- | --- |
 | `tpope/vim-rails` (+ `vim-projectionist`, `vim-bundler`) | Rails navigation: `:A`, `:E*`, `gf`, `.projections.json` |
 | `tpope/vim-endwise` | Auto-insert `end` in Ruby/Lua/sh |
-| `sato-s/telescope-rails.nvim` | Fuzzy pickers per Rails resource (`<leader>rm/rc/rv/rs/ri/rl`) |
+| _(local, in `ruby.lua`)_ | Fuzzy pickers per Rails resource + a `bin/rails` command surface (`<leader>r`) |
 | `windwp/nvim-ts-autotag` | Auto close/rename JSX/HTML/ERB tags |
 | `MeanderingProgrammer/render-markdown.nvim` | In-buffer Markdown rendering |
 | `iamcco/markdown-preview.nvim` | Browser Markdown preview (`<leader>cp`) |
@@ -58,13 +69,14 @@ Servers enabled: `ruby_lsp` (via `mise x`), `vtsls`, `eslint`, `stimulus_ls`, `l
 
 (`stimulus.lua` is intentionally empty — Stimulus is covered by `stimulus_ls` + treesitter.)
 
-## Git / tests / AI — `git.lua`, `test.lua`, `ai.lua`
+## Git / tests / debug / AI — `git.lua`, `test.lua`, `dap.lua`, `ai.lua`
 
 | Plugin | Purpose |
 | --- | --- |
 | `lewis6991/gitsigns.nvim` | Signs, hunk stage/reset/preview/blame (`<leader>gh`, `]c`/`[c`) |
 | `sindrets/diffview.nvim` | Rich diffs + file history (`<leader>gd/gf/gF`) |
 | `nvim-neotest/neotest` (+ neotest-rspec, neotest-jest) | Run RSpec (`bin/rspec`) and Jest (`yarn jest`) (`<leader>t`) |
+| `mfussenegger/nvim-dap` (+ nvim-dap-ruby, dap-ui, dap-virtual-text) | Breakpoint debugging for Ruby via `rdbg` / the `debug` gem (`<leader>d`) |
 | `zbirenbaum/copilot.lua` | Inline Copilot suggestions |
 | `CopilotC-Nvim/CopilotChat.nvim` | Copilot chat panel (`<leader>a`) |
 | `yetone/avante.nvim` | Cursor-style AI sidebar on the Copilot provider (`<leader>A`) |

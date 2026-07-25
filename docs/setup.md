@@ -59,6 +59,22 @@ Verify all three resolve: `mise ls`, then `tree-sitter --version`.
 
 > Ruby linters/formatters (`ruby-lsp`, `standardrb`, `rubocop`) come from each project's own bundle, not from a global install — nothing extra to set up here.
 
+### ERB formatting (optional)
+
+The ERB **language server** (`herb-language-server`) is installed automatically by Mason. The matching ERB **formatter** is a separate package and is not, because it's best pinned per project:
+
+```sh
+# preferred — add it to the Rails app's package.json so the team shares a version
+yarn add --dev @herb-tools/formatter
+
+# or globally, if you'd rather not touch the project
+npm install -g @herb-tools/formatter
+```
+
+conform resolves `herb-format` from the project's `node_modules/.bin` first and falls back to a global install (the same mechanism as Prettier). Until it's installed, saving an `.erb` file is simply a no-op rather than an error — so this step is safe to skip.
+
+> Herb's formatter is still an experimental preview upstream, so the first save of a long-lived view can produce a large reformat diff. `:FormatDisable!` turns autoformat off for the current buffer, `:FormatDisable` globally. See [rails-workflow.md](rails-workflow.md#formatting--linting).
+
 ## 3. AI CLIs (subscription-based, no API keys)
 
 The `<leader>a` agent terminals and Copilot are all subscription-based. Install each per its official instructions:
