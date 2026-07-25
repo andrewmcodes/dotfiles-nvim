@@ -21,15 +21,25 @@ const WORLDS = [
     id: "daily",
     title: "Daily Drivers",
     icon: "⚡",
-    blurb: "The moves you make a hundred times a day: find, jump, save, navigate.",
+    blurb:
+      "The moves you make a hundred times a day: find, jump, save, navigate.",
     accent: "#7dd3fc",
   },
   {
     id: "rails",
     title: "Rails, Rails, Rails",
     icon: "🚂",
-    blurb: "Fly between models, controllers, views and specs like Tim Pope himself.",
+    blurb:
+      "Fly between models, controllers, views and specs like Tim Pope himself.",
     accent: "#fca5a5",
+  },
+  {
+    id: "surgery",
+    title: "Ruby Surgery",
+    icon: "🔪",
+    blurb:
+      "Operate on whole methods and classes at once — treesitter-accurate, not guesswork.",
+    accent: "#f0abfc",
   },
   {
     id: "test",
@@ -37,6 +47,14 @@ const WORLDS = [
     icon: "🧪",
     blurb: "Run RSpec without leaving your seat. Red, green, refactor.",
     accent: "#86efac",
+  },
+  {
+    id: "debug",
+    title: "Debugger",
+    icon: "🐞",
+    blurb:
+      "Real breakpoints in a running Rails app. Put the `puts` statements down.",
+    accent: "#fb923c",
   },
   {
     id: "code",
@@ -49,7 +67,8 @@ const WORLDS = [
     id: "git",
     title: "Git Flow",
     icon: "🌿",
-    blurb: "Stage hunks, blame lines and open Lazygit without touching the mouse.",
+    blurb:
+      "Stage hunks, blame lines and open Lazygit without touching the mouse.",
     accent: "#c4b5fd",
   },
   {
@@ -63,14 +82,16 @@ const WORLDS = [
     id: "motion",
     title: "Motion Master",
     icon: "🥷",
-    blurb: "Flash, surround and comment. Bonus: these all work inside VS Code too.",
+    blurb:
+      "Flash, surround and comment. Bonus: these all work inside VS Code too.",
     accent: "#5eead4",
   },
   {
     id: "obsidian",
     title: "Second Brain",
     icon: "🧠",
-    blurb: "Capture, link and navigate your Obsidian vault without leaving Neovim.",
+    blurb:
+      "Capture, link and navigate your Obsidian vault without leaving Neovim.",
     accent: "#a78bfa",
   },
   {
@@ -204,6 +225,24 @@ const CARDS = [
     prompt: "Go to the previous open file in the bufferline.",
     mnemonic: "Shift-H pulls you left.",
   },
+  {
+    id: "undo-tree",
+    world: "daily",
+    keys: ["<leader>uu"],
+    label: "Undo tree",
+    prompt:
+      "Browse this file's whole undo history — including from previous sessions.",
+    mnemonic: "u-u = undo, undo. Your safety net when a keystroke goes wrong.",
+  },
+  {
+    id: "restore-session",
+    world: "daily",
+    keys: ["<leader>qs"],
+    label: "Restore session",
+    prompt:
+      "Reopen this project exactly as you left it: same buffers, same layout.",
+    mnemonic: "q-s = the session you quit. (q-q quits, q-s brings it back.)",
+  },
 
   // ── Rails, Rails, Rails ──────────────────────────────────────────────────
   {
@@ -263,6 +302,56 @@ const CARDS = [
     mnemonic: "r-i = migratIons.",
   },
   {
+    id: "rails-jobs",
+    world: "rails",
+    keys: ["<leader>rj"],
+    label: "Jobs picker",
+    prompt: "Fuzzy-find any background job in app/jobs.",
+    mnemonic: "r-j = Rails jobs.",
+  },
+  {
+    id: "rails-stimulus",
+    world: "rails",
+    keys: ["<leader>rt"],
+    label: "Stimulus controllers picker",
+    prompt: "Fuzzy-find a Stimulus *_controller.js.",
+    mnemonic: "r-t = Rails sTimulus (r-c is already Rails controllers).",
+  },
+  {
+    id: "rails-schema",
+    world: "rails",
+    keys: ["<leader>rd"],
+    label: "Open db/schema.rb",
+    prompt: "Jump to the schema to check a column name or type.",
+    mnemonic: "r-d = Rails database.",
+  },
+  {
+    id: "rails-routes",
+    world: "rails",
+    keys: ["<leader>rR"],
+    label: "Routes picker",
+    prompt:
+      "Search every route, then jump straight to the controller action it maps to.",
+    mnemonic: "r-R = Rails Routes (capital R — lowercase r-r is 'related').",
+  },
+  {
+    id: "rails-console",
+    world: "rails",
+    keys: ["<leader>rC"],
+    label: "Rails console",
+    prompt: "Open bin/rails console in a floating terminal.",
+    mnemonic:
+      "r-C = Rails Console (capital C — r-c is the controllers picker).",
+  },
+  {
+    id: "rails-migrate",
+    world: "rails",
+    keys: ["<leader>rM"],
+    label: "Run migrations",
+    prompt: "Run bin/rails db:migrate without leaving the editor.",
+    mnemonic: "r-M = Rails Migrate (capital M — r-m is the models picker).",
+  },
+  {
     id: "gf",
     world: "rails",
     keys: ["gf"],
@@ -285,6 +374,77 @@ const CARDS = [
     label: "Run code lens",
     prompt: "Follow ruby-lsp's 'Jump to view' / run-test lens on this line.",
     mnemonic: "c-l = code lens.",
+  },
+
+  // ── Ruby Surgery (treesitter textobjects + vim-matchup) ──────────────────
+  // Standalone Neovim only — these are gated off inside VS Code.
+  {
+    id: "match-pair",
+    world: "surgery",
+    keys: ["%"],
+    label: "Jump def ↔ end",
+    prompt:
+      "Leap from a `def` (or `if`/`do`/`class`) to its matching `end`, and back.",
+    mnemonic:
+      "% = the percent-sign pivot: bounce to the other half of the pair.",
+  },
+  {
+    id: "delete-method",
+    world: "surgery",
+    keys: ["dam"],
+    label: "Delete a whole method",
+    prompt:
+      "Delete an entire `def` … `end`, body and all, from anywhere inside it.",
+    mnemonic: "d-a-m = delete around method.",
+  },
+  {
+    id: "select-method-inner",
+    world: "surgery",
+    keys: ["vim"],
+    label: "Select a method body",
+    prompt:
+      "Visually select just the inside of this method, without its def/end.",
+    mnemonic: "v-i-m = visual inside method. (Yes, really.)",
+  },
+  {
+    id: "change-class-inner",
+    world: "surgery",
+    keys: ["cic"],
+    label: "Change a class body",
+    prompt: "Wipe the inside of this class and start typing a new body.",
+    mnemonic: "c-i-c = change inside class.",
+  },
+  {
+    id: "next-method",
+    world: "surgery",
+    keys: ["]m"],
+    label: "Next method",
+    prompt: "Jump down to the start of the next method in this file.",
+    mnemonic: "] forward, m = method.",
+  },
+  {
+    id: "prev-method",
+    world: "surgery",
+    keys: ["[m"],
+    label: "Previous method",
+    prompt: "Jump up to the start of the previous method.",
+    mnemonic: "[ back, m = method.",
+  },
+  {
+    id: "next-class",
+    world: "surgery",
+    keys: ["]]"],
+    label: "Next class",
+    prompt: "Jump to the next class or module definition.",
+    mnemonic: "]] = a bigger jump than ]m — whole classes.",
+  },
+  {
+    id: "delete-param",
+    world: "surgery",
+    keys: ["daa"],
+    label: "Delete an argument",
+    prompt: "Remove one parameter from this method signature, comma and all.",
+    mnemonic: "d-a-a = delete around argument.",
   },
 
   // ── Test Lab ─────────────────────────────────────────────────────────────
@@ -335,6 +495,75 @@ const CARDS = [
     label: "Toggle watch mode",
     prompt: "Re-run specs automatically every time you save.",
     mnemonic: "t-w = test watch.",
+  },
+
+  // ── Debugger (nvim-dap + rdbg) ───────────────────────────────────────────
+  {
+    id: "breakpoint",
+    world: "debug",
+    keys: ["<leader>db"],
+    label: "Toggle breakpoint",
+    prompt: "Drop a breakpoint on this line so execution stops here.",
+    mnemonic: "d-b = debug breakpoint.",
+  },
+  {
+    id: "debug-continue",
+    world: "debug",
+    keys: ["<leader>dc"],
+    label: "Start / continue",
+    prompt: "Start a debug session, or resume until the next breakpoint.",
+    mnemonic: "d-c = debug continue.",
+  },
+  {
+    id: "debug-step-over",
+    world: "debug",
+    keys: ["<leader>do"],
+    label: "Step over",
+    prompt:
+      "Run this line and stop on the next one — don't descend into the call.",
+    mnemonic: "d-o = debug over.",
+  },
+  {
+    id: "debug-step-into",
+    world: "debug",
+    keys: ["<leader>di"],
+    label: "Step into",
+    prompt: "Descend into the method being called on this line.",
+    mnemonic: "d-i = debug into.",
+  },
+  {
+    id: "debug-test",
+    world: "debug",
+    keys: ["<leader>td"],
+    label: "Debug nearest spec",
+    prompt:
+      "Run the spec under your cursor under the debugger, stopping at breakpoints.",
+    mnemonic:
+      "t-d = test debug (it lives in the test group, not the debug one).",
+  },
+  {
+    id: "debug-ui",
+    world: "debug",
+    keys: ["<leader>du"],
+    label: "Toggle debug UI",
+    prompt: "Show or hide the scopes / stack / watches panels.",
+    mnemonic: "d-u = debug UI.",
+  },
+  {
+    id: "debug-inspect",
+    world: "debug",
+    keys: ["<leader>dK"],
+    label: "Inspect value",
+    prompt: "Show the value of the variable under the cursor while stopped.",
+    mnemonic: "d-K = debug hover, echoing plain K for hover docs.",
+  },
+  {
+    id: "debug-terminate",
+    world: "debug",
+    keys: ["<leader>dt"],
+    label: "Terminate session",
+    prompt: "Stop debugging and close the debugger UI.",
+    mnemonic: "d-t = debug terminate.",
   },
 
   // ── Code & Fix ───────────────────────────────────────────────────────────
@@ -401,6 +630,15 @@ const CARDS = [
     label: "Toggle inlay hints",
     prompt: "Show or hide the inline type hints.",
     mnemonic: "t-h = toggle hints.",
+  },
+  {
+    id: "toggle-virtual-lines",
+    world: "code",
+    keys: ["<leader>uv"],
+    label: "Toggle full-width diagnostics",
+    prompt:
+      "Switch between the full wrapped error under the cursor line and the compact inline one.",
+    mnemonic: "u-v = UI virtual lines.",
   },
 
   // ── Git Flow ─────────────────────────────────────────────────────────────

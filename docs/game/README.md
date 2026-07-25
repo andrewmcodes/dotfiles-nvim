@@ -26,21 +26,30 @@ python3 -m http.server -d docs/game 8000   # then visit http://localhost:8000
 
 ## Worlds (ordered by how often a Rails dev reaches for them)
 
-1. ⚡ **Daily Drivers** — find files, grep, save, definition/references, window & buffer nav
-2. 🚂 **Rails, Rails, Rails** — alternate/related file, model/controller/view/spec/migration pickers, `gf`, workspace symbols, code lens
-3. 🧪 **Test Lab** — run nearest/file/last, summary, output, watch (neotest + RSpec)
-4. 🔧 **Code & Fix** — rename, code action, format, diagnostics, Trouble
-5. 🌿 **Git Flow** — Lazygit, Diffview, blame, hunks, stage/reset
-6. 🤖 **AI Copilot** — accept/cycle suggestions, chat, explain/fix/tests, Claude Code terminal
-7. 🥷 **Motion Master** — flash, surround, comment, move lines (these work in VS Code too)
-8. 🧠 **Second Brain** — Obsidian: daily note, new/search/quick-switch, backlinks, follow link, toggle checkbox, templates
-9. 👑 **Boss: Everything** — a gauntlet drawn from every world (unlocks once the rest are cleared)
+1. ⚡ **Daily Drivers** — find files, grep, save, definition/references, window & buffer nav, undo tree, session restore
+2. 🚂 **Rails, Rails, Rails** — alternate/related file, resource pickers (models → jobs → Stimulus), routes picker, console, migrate, `gf`, workspace symbols, code lens
+3. 🔪 **Ruby Surgery** — `%` between `def`/`end`, whole-method and whole-class textobjects, method/class motions (treesitter-accurate; standalone Neovim only)
+4. 🧪 **Test Lab** — run nearest/file/last, summary, output, watch (neotest + RSpec)
+5. 🐞 **Debugger** — breakpoints, continue, step over/into, inspect a value, debug the nearest spec (nvim-dap + `rdbg`)
+6. 🔧 **Code & Fix** — rename, code action, format, diagnostics, Trouble
+7. 🌿 **Git Flow** — Lazygit, Diffview, blame, hunks, stage/reset
+8. 🤖 **AI Copilot** — accept/cycle suggestions, chat, explain/fix/tests, Claude Code terminal
+9. 🥷 **Motion Master** — flash, surround, comment, move lines (these work in VS Code too)
+10. 🧠 **Second Brain** — Obsidian: daily note, new/search/quick-switch, backlinks, follow link, toggle checkbox, templates
+11. 👑 **Boss: Everything** — a gauntlet drawn from every world (unlocks once the rest are cleared)
+
+> **Ruby Surgery** and **Debugger** are standalone-Neovim only — treesitter textobjects, vim-matchup and nvim-dap are all gated off inside VS Code. **Motion Master** is the world whose moves carry over.
 
 Every world is playable immediately — pick any one. Clearing a world still fills its mastery ring and marks it ✓, and the Boss draws from all of them. Progress is saved in your browser's `localStorage` — the `↺ Reset` button wipes it.
 
 ## Where the data comes from
 
 `data.js` is the whole dataset, and every entry is a real binding from this config. The source of truth for keymaps is still [`docs/keymaps.md`](../keymaps.md) and [`docs/rails-workflow.md`](../rails-workflow.md) — when a keymap changes there, update `data.js` to match.
+
+Two traps when adding a card, both of which have bitten this file before:
+
+- **The answer has to be typeable.** `keys[0]` is parsed into chords and compared against real keydown events. A token whose base no keypress can produce (e.g. writing `<Space>` in a way the parser resolves to the literal string `"space"`) makes the card unanswerable. Shifted punctuation like `%` and `?` is handled by the `SHIFTED` map in `game.js` — if you add a card needing a glyph that isn't in it, extend it.
+- **Mind the mobile keypad.** Touch users can only press what `KEYPAD_ROWS` offers, so a card needing a new punctuation key also needs that key added there.
 
 ## Files
 

@@ -86,16 +86,27 @@
     return tokens;
   }
 
+  // Named keys are matched case-insensitively: Neovim itself accepts <Space>,
+  // <space> and <SPACE>, and data.js uses both `<leader><space>` and `<C-Space>`.
+  // Matching only the capitalised spelling silently produced a base of "space",
+  // which no keypress can ever yield — making that card unanswerable.
+  const NAMED_KEYS = {
+    leader: " ",
+    space: " ",
+    cr: "enter",
+    enter: "enter",
+    tab: "tab",
+    esc: "escape",
+    escape: "escape",
+  };
+
   function parseSpecial(inner) {
-    if (inner === "leader") return chord(" ");
-    if (inner === "Space") return chord(" ");
-    if (inner === "CR") return chord("enter");
-    if (inner === "Tab") return chord("tab");
-    if (inner === "Esc") return chord("escape");
+    const named = NAMED_KEYS[inner.toLowerCase()];
+    if (named !== undefined) return chord(named);
     const m = inner.match(/^([CSAM])-(.+)$/);
     if (m) {
       const mod = m[1];
-      const rest = m[2] === "Space" ? " " : m[2];
+      const rest = NAMED_KEYS[m[2].toLowerCase()] || m[2];
       const c = chord(
         rest.length === 1 ? rest.toLowerCase() : rest.toLowerCase(),
       );
@@ -148,13 +159,47 @@
     Tab: "tab",
     Escape: "escape",
   };
+
+  // Shift + a punctuation/number key produces a different character, and that
+  // character IS the binding (`%`, `?`, `{`). Without this, Shift+5 resolves to
+  // "shift+5" and can never match a `%` card. US layout; e.key would give us the
+  // right glyph but is unreliable once Alt is involved, hence the explicit map.
+  const SHIFTED = {
+    Digit1: "!",
+    Digit2: "@",
+    Digit3: "#",
+    Digit4: "$",
+    Digit5: "%",
+    Digit6: "^",
+    Digit7: "&",
+    Digit8: "*",
+    Digit9: "(",
+    Digit0: ")",
+    Minus: "_",
+    Equal: "+",
+    BracketLeft: "{",
+    BracketRight: "}",
+    Backslash: "|",
+    Semicolon: ":",
+    Quote: '"',
+    Comma: "<",
+    Period: ">",
+    Slash: "?",
+    Backquote: "~",
+  };
+
   function chordFromEvent(e) {
     let base;
+    let shift = e.shiftKey;
     if (/^Key[A-Z]$/.test(e.code)) base = e.code.slice(3).toLowerCase();
-    else if (/^Digit\d$/.test(e.code)) base = e.code.slice(5);
+    else if (shift && SHIFTED[e.code] !== undefined) {
+      // Shift is consumed producing the glyph, so don't also report it held.
+      base = SHIFTED[e.code];
+      shift = false;
+    } else if (/^Digit\d$/.test(e.code)) base = e.code.slice(5);
     else if (CODE_MAP[e.code] !== undefined) base = CODE_MAP[e.code];
     else base = (e.key || "").toLowerCase();
-    return { base, ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey };
+    return { base, ctrl: e.ctrlKey, alt: e.altKey, shift };
   }
 
   // Human-friendly keycaps for a token: ["Ctrl","S"], ["⇧","K"], ["Space"], ["]"]
@@ -595,7 +640,7 @@
     ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
     ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
     ["z", "x", "c", "v", "b", "n", "m"],
-    ["[", "]", ",", "/", "?"],
+    ["[", "]", ",", "/", "?", "%"],
   ];
 
   function keyLabel(k) {
